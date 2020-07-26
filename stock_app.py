@@ -1,9 +1,11 @@
 import dash
+import dash_table
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_auth
 
+import pandas as pd
 from pandas_datareader import data as web
 from datetime import datetime as dt
 
@@ -13,12 +15,21 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'world':'hello'
 }
 
+df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/solar.csv')
+
 app = dash.Dash('Hello World')
 server = app.server
 
 auth = dash_auth.BasicAuth(
     app,
     VALID_USERNAME_PASSWORD_PAIRS
+)
+
+
+app.layout = dash_table.DataTable(
+    id='table',
+    columns=[{"name": i, "id": i} for i in df.columns],
+    data=df.to_dict('records'),
 )
 
 app.layout = html.Div([
