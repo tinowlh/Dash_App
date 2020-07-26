@@ -41,7 +41,6 @@ app.layout = html.Div([
             {'label': 'Apple', 'value': 'AAPL'}
         ],
         value='TSLA'
-        ,multi = True
     ),
     dcc.Graph(id='my-graph')
 ], style={'width': '500'})
