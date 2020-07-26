@@ -9,13 +9,16 @@ import pandas as pd
 from pandas_datareader import data as web
 from datetime import datetime as dt
 
+
+
 # Keep this out of source code repository - save in a file or a database
+
 VALID_USERNAME_PASSWORD_PAIRS = {
     'hello': 'world',
     'world':'hello'
 }
 
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/solar.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv')
 
 app = dash.Dash('Hello World')
 server = app.server
@@ -41,9 +44,17 @@ app.layout = html.Div([
             {'label': 'Apple', 'value': 'AAPL'}
         ],
         value='TSLA'
+    ), 
+    dash_table.DataTable(
+    id='table',
+    columns=[{"name": i, "id": i} for i in df.columns],
+    data=df.to_dict('records'),
+    sort_action="native",
+    filter_action='native'
     ),
     dcc.Graph(id='my-graph')
 ], style={'width': '500'})
+
 
 @app.callback(Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
 def update_graph(selected_dropdown_value):
