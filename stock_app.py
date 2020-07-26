@@ -29,7 +29,8 @@ app.layout = html.Div([
             {'label': 'Tesla', 'value': 'TSLA'},
             {'label': 'Apple', 'value': 'AAPL'}
         ],
-        value='COKE'
+        value='TSLA'
+        ,multi = True
     ),
     dcc.Graph(id='my-graph')
 ], style={'width': '500'})
@@ -39,7 +40,7 @@ def update_graph(selected_dropdown_value):
     df = web.DataReader(
         selected_dropdown_value,
         'yahoo',
-        dt(2017, 1, 1),
+        dt(2018, 1, 1),
         dt.now()
     )
     return {
