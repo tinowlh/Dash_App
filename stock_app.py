@@ -45,12 +45,12 @@ app.layout = html.Div([
         ],
         value='TSLA'
     ), 
+    html.Br(),
     dash_table.DataTable(
     id='table',
     columns=[{"name": i, "id": i} for i in df.columns],
     data=df.to_dict('records'),
-    sort_action="native",
-    filter_action='native'
+    sort_action="native"
     ),
     dcc.Graph(id='my-graph')
 ], style={'width': '500'})
