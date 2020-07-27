@@ -10,6 +10,19 @@ from pandas_datareader import data as web
 from datetime import datetime as dt
 
 
+import plotly.graph_objects as go
+import plotly.io as pio
+
+plotly_template = pio.templates["plotly_dark"]
+print (plotly_template)
+
+pio.templates["plotly_dark_custom"] = pio.templates["plotly_dark"]
+
+
+
+
+
+
 def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
     df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
     df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
@@ -36,7 +49,8 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'world':'hello'
 }
 
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv')
+l_of_stock = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
+df_stock = get_stockP(l_of_stock)
 
 app = dash.Dash('Hello World')
 server = app.server
@@ -52,12 +66,11 @@ app.layout = html.Div([
     dcc.Dropdown(
         id='my-dropdown',
         options=[
-            {'label': 'Coke', 'value': 'COKE'},
             {'label': 'Tesla', 'value': 'TSLA'},
-            {'label': 'Apple', 'value': 'AAPL'},
+            {'label': 'NVIDIA', 'value': 'NVDA'},
+            {'label': 'AMD', 'value': 'AMD'},
+            {'label': 'Intel', 'value': 'INTL'},
             {'label': 'VTI', 'value': 'VTI'},
-            {'label': 'VEA', 'value': 'VEA'},
-            {'label': 'VWO', 'value': 'VWO'},
         ],
         value='TSLA'
     ), 
