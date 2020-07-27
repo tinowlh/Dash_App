@@ -54,8 +54,10 @@ auth = dash_auth.BasicAuth(
 
 
 app.layout = html.Div([
-    html.Div(["Input: ",
-              dcc.Input(id='my-input', value=1, type='number'),
+    html.Div(["Input1: ",
+              dcc.Input(id='my-input1', value=1, type='number'),
+              "Input2: ",
+              dcc.Input(id='my-input2', value=1, type='number'),
               html.Div(id='my-output')]),
     html.Br(),          
     #html.Label('Stock Ticker'),
@@ -93,10 +95,15 @@ app.layout = html.Div([
 
 @app.callback(
     Output(component_id='my-output', component_property='children'),
-    [Input(component_id='my-input', component_property='value')]
+    [Input(component_id='my-input1', component_property='value'),
+    Input(component_id='my-input2', component_property='value')]
 )
-def update_output_div(input_value):
-    v = input_value * 100
+def update_output_div(input_value1, input_value2):
+    if input_value1 == None:
+        input_value1 = 0 
+    if input_value2 == None:
+        input_value2 = 0 
+    v = (input_value1 - input_value2) * 100
     return 'Output: {}'.format(v)
 
 
