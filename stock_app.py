@@ -66,10 +66,10 @@ app.layout = html.Div([
     dcc.Dropdown(
         id='my-dropdown',
         options=[
-            {'label': 'Tesla', 'value': 'TSLA'},
+            {'label': 'TESLA', 'value': 'TSLA'},
             {'label': 'NVIDIA', 'value': 'NVDA'},
             {'label': 'AMD', 'value': 'AMD'},
-            {'label': 'Intel', 'value': 'INTL'},
+            {'label': 'INTEL', 'value': 'INTL'},
             {'label': 'VTI', 'value': 'VTI'},
         ],
         value='TSLA'
