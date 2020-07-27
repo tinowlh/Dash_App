@@ -10,14 +10,8 @@ from pandas_datareader import data as web
 from datetime import datetime as dt
 
 
-import plotly.graph_objects as go
-import plotly.io as pio
-
-plotly_template = pio.templates["plotly_dark"]
-print (plotly_template)
-
-pio.templates["plotly_dark_custom"] = pio.templates["plotly_dark"]
-
+#import plotly.io as pio
+#pio.templates.default = "plotly_dark"
 
 
 
