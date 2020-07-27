@@ -41,7 +41,10 @@ app.layout = html.Div([
         options=[
             {'label': 'Coke', 'value': 'COKE'},
             {'label': 'Tesla', 'value': 'TSLA'},
-            {'label': 'Apple', 'value': 'AAPL'}
+            {'label': 'Apple', 'value': 'AAPL'},
+            {'label': 'VTI', 'value': 'VTI'},
+            {'label': 'VEA', 'value': 'VEA'},
+            {'label': 'VWO', 'value': 'VWO'},
         ],
         value='TSLA'
     ), 
@@ -54,7 +57,7 @@ app.layout = html.Div([
     data=df.to_dict('records'),
     sort_action="native"
     )
-], style={'width': '500'})
+], style={'width': '600'})
 
 
 @app.callback(Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
