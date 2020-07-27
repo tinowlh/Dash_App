@@ -75,6 +75,7 @@ app.layout = html.Div([
     id='table',
     columns=[{"name": i, "id": i} for i in df_stock.columns],
     data=df_stock.to_dict('records'),
+    page_size = 30,
     sort_action="native"
     )
 ], style={'width': '600'})
