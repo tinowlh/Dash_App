@@ -10,6 +10,24 @@ from pandas_datareader import data as web
 from datetime import datetime as dt
 
 
+def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
+    df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
+    df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
+    df_stock.columns =df_stock.columns.droplevel()
+    df_stock = df_stock.reset_index('Date')
+    df_stock['Date'] = df_stock['Date'].dt.date
+    return df_stock
+
+
+l_of_stock = ['VTI', 'VEA', 'VWO']
+df_stock = get_stockP(l_of_stock)
+
+
+
+
+
+
+
 
 # Keep this out of source code repository - save in a file or a database
 
@@ -29,11 +47,6 @@ auth = dash_auth.BasicAuth(
 )
 
 
-app.layout = dash_table.DataTable(
-    id='table',
-    columns=[{"name": i, "id": i} for i in df.columns],
-    data=df.to_dict('records'),
-)
 
 app.layout = html.Div([
     dcc.Dropdown(
@@ -53,8 +66,8 @@ app.layout = html.Div([
     html.Br(),
     dash_table.DataTable(
     id='table',
-    columns=[{"name": i, "id": i} for i in df.columns],
-    data=df.to_dict('records'),
+    columns=[{"name": i, "id": i} for i in df_stock.columns],
+    data=df_stock.to_dict('records'),
     sort_action="native"
     )
 ], style={'width': '600'})
