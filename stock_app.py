@@ -71,7 +71,7 @@ app.layout = html.Div([
             {'label': 'TESLA', 'value': 'TSLA'},
             {'label': 'NVIDIA', 'value': 'NVDA'},
             {'label': 'AMD', 'value': 'AMD'},
-            {'label': 'INTEL', 'value': 'INTL'},
+            {'label': 'INTEL', 'value': 'INTC'},
             {'label': 'VTI', 'value': 'VTI'},
         ],
         value='TSLA'
@@ -79,19 +79,21 @@ app.layout = html.Div([
     html.Br(),
     dcc.Graph(id='my-graph'),
     html.Br(),
+    dcc.Markdown('**Stock Price**'),
     dash_table.DataTable(
     id='table',
     columns=[{"name": i, "id": i} for i in df_stock.columns],
     data=df_stock.to_dict('records'),
-    page_size = 30,
+    page_size = 20,
     sort_action="native"
     ),
     html.Br(),
+    dcc.Markdown('**Percentage Change**'),
     dash_table.DataTable(
     id='table_return',
     columns=[{"name": i, "id": i} for i in df_stock_return.columns],
     data=df_stock_return.to_dict('records'),
-    page_size = 30,
+    page_size = 20,
     sort_action="native"
     )
 ], style={'width': '600'})
