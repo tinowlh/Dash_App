@@ -15,8 +15,6 @@ from datetime import datetime as dt
 
 
 
-
-
 def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
     df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
     df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
@@ -25,13 +23,11 @@ def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
     df_stock['Date'] = df_stock['Date'].dt.date
     return df_stock
 
-
-l_of_stock = ['VTI', 'VEA', 'VWO']
-df_stock = get_stockP(l_of_stock)
-
-
-
-
+def get_stockP_return(df_stock):
+    df_stock = df_stock.set_index('Date')
+    df_stock_return = df_stock.pct_change()
+    df_stock_return = df_stock_return.reset_index('Date')
+    return df_stock_return
 
 
 
@@ -45,6 +41,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
 
 l_of_stock = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
 df_stock = get_stockP(l_of_stock)
+df_stock_return = get_stockP_return(df_stock)
 
 app = dash.Dash('Hello World')
 server = app.server
@@ -79,6 +76,14 @@ app.layout = html.Div([
     data=df_stock.to_dict('records'),
     page_size = 30,
     sort_action="native"
+    ),
+    html.Br(),
+    dash_table.DataTable(
+    id='table_return',
+    columns=[{"name": i, "id": i} for i in df_stock_return.columns],
+    data=df_stock_return.to_dict('records'),
+    page_size = 30,
+    sort_action="native"
     )
 ], style={'width': '600'})
 
@@ -102,4 +107,4 @@ def update_graph(selected_dropdown_value):
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
