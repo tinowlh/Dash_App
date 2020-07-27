@@ -43,6 +43,9 @@ l_of_stock = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
 df_stock = get_stockP(l_of_stock)
 df_stock_return = get_stockP_return(df_stock)
 
+df_stock = df_stock.sort_values(by='Date', ascending=False)
+df_stock_return = df_stock_return.sort_values(by='Date', ascending=False)
+
 app = dash.Dash('Hello World')
 server = app.server
 
