@@ -57,6 +57,8 @@ auth = dash_auth.BasicAuth(
 
 
 app.layout = html.Div([
+    html.Label('Stock Ticker'),
+    #dcc.Markdown('**Stock Ticker**'),
     dcc.Dropdown(
         id='my-dropdown',
         options=[
