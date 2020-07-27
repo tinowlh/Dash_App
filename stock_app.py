@@ -54,8 +54,12 @@ auth = dash_auth.BasicAuth(
 
 
 app.layout = html.Div([
-    html.Label('Stock Ticker'),
-    #dcc.Markdown('**Stock Ticker**'),
+    html.Div(["Input: ",
+              dcc.Input(id='my-input', value=1, type='number'),
+              html.Div(id='my-output')]),
+    html.Br(),          
+    #html.Label('Stock Ticker'),
+    dcc.Markdown('**Stock Ticker**'),
     dcc.Dropdown(
         id='my-dropdown',
         options=[
@@ -86,6 +90,14 @@ app.layout = html.Div([
     sort_action="native"
     )
 ], style={'width': '600'})
+
+@app.callback(
+    Output(component_id='my-output', component_property='children'),
+    [Input(component_id='my-input', component_property='value')]
+)
+def update_output_div(input_value):
+    v = input_value * 100
+    return 'Output: {}'.format(v)
 
 
 @app.callback(Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
