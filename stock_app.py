@@ -19,13 +19,13 @@ def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
     df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
     df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
     df_stock.columns =df_stock.columns.droplevel()
-    df_stock = df_stock.reset_index('Date')
+    df_stock = df_stock.reset_index('Date').round(2)
     df_stock['Date'] = df_stock['Date'].dt.date
     return df_stock
 
 def get_stockP_return(df_stock):
     df_stock = df_stock.set_index('Date')
-    df_stock_return = df_stock.pct_change()
+    df_stock_return = df_stock.pct_change().round(4)
     df_stock_return = df_stock_return.reset_index('Date')
     return df_stock_return
 
