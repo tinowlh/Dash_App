@@ -13,8 +13,6 @@ from datetime import datetime as dt
 #import plotly.io as pio
 #pio.templates.default = "plotly_dark"
 
-
-
 def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
     df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
     df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
@@ -39,8 +37,8 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'world':'hello'
 }
 
-l_of_stock = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
-df_stock = get_stockP(l_of_stock)
+l_of_stocks = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
+df_stock = get_stockP(l_of_stocks)
 df_stock_return = get_stockP_return(df_stock)
 
 df_stock = df_stock.sort_values(by='Date', ascending=False)
@@ -53,7 +51,6 @@ auth = dash_auth.BasicAuth(
     app,
     VALID_USERNAME_PASSWORD_PAIRS
 )
-
 
 
 app.layout = html.Div([
@@ -74,7 +71,7 @@ app.layout = html.Div([
             {'label': 'INTEL', 'value': 'INTC'},
             {'label': 'VTI', 'value': 'VTI'},
         ],
-        value='TSLA'
+        value='VTI'
     ), 
     html.Br(),
     dcc.Graph(id='my-graph'),
@@ -95,6 +92,11 @@ app.layout = html.Div([
     data=df_stock_return.to_dict('records'),
     page_size = 20,
     sort_action="native"
+    ),
+    dcc.Interval(
+            id='interval-component',
+            interval=1*1000, # in milliseconds
+            n_intervals=0
     )
 ], style={'width': '600'})
 
@@ -112,7 +114,8 @@ def update_output_div(input_value1, input_value2):
     return 'Output: {}'.format(v)
 
 
-@app.callback(Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
+@app.callback(Output('my-graph', 'figure'), 
+            [Input('my-dropdown', 'value')])
 def update_graph(selected_dropdown_value):
     df = web.DataReader(
         selected_dropdown_value,
@@ -127,6 +130,22 @@ def update_graph(selected_dropdown_value):
         }],
         'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
     }
+
+@app.callback(Output('table', 'data'),
+            [Input('interval-component', 'n_intervals')])
+def update_datatable(n):
+    l_of_stocks = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
+    df_stock = web.DataReader(l_of_stocks, 'yahoo', dt(2018, 1, 1), dt.now())
+    df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
+    df_stock.columns =df_stock.columns.droplevel()
+    df_stock = df_stock.reset_index('Date').round(2)
+    df_stock['Date'] = df_stock['Date'].dt.date
+    df_stock = df_stock.sort_values(by='Date', ascending=False)
+    data=df_stock.to_dict('records')
+    
+    return data
+
+
 
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
