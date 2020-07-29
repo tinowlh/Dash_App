@@ -8,10 +8,43 @@ import dash_auth
 import pandas as pd
 from pandas_datareader import data as web
 from datetime import datetime as dt
-
+#import datetime
+#import investpy
 
 #import plotly.io as pio
 #pio.templates.default = "plotly_dark"
+
+
+#### Investing.com: Stock Price
+#def get_stock_price (stock, from_date, to_date, country= 'united states'):
+#
+#    df = investpy.get_stock_historical_data(stock= stock,
+#                                        country= country,
+#                                        from_date= from_date,
+#                                        to_date= to_date)
+#    df = df[['Close']]
+#    df = df.rename(columns = {'Close':'{stock}'.format(stock=stock)})
+#    df = df.reset_index('Date')
+#    df['Date'] = df['Date'].dt.date
+##    df.index = pd.to_datetime(df.index)
+#
+##    df.index = df.index.strftime("%G") + df.index.strftime("%V")
+##    df = df.groupby(df.index).mean()
+#
+#    return df
+#
+#
+#today = datetime.date.today()
+#fr_date = '01/01/2018'
+#today = today.strftime("%d/%m/%Y") # dd/mm/YY
+#
+#
+#
+#df = get_stock_price(stock= '2376', country= 'taiwan',
+#                                    from_date= fr_date,
+#                                    to_date= today)
+
+
 
 def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
     df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
@@ -37,7 +70,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'world':'hello'
 }
 
-l_of_stocks = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
+l_of_stocks = ['0050.TW', 'TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
 df_stock = get_stockP(l_of_stocks)
 df_stock_return = get_stockP_return(df_stock)
 
@@ -65,13 +98,14 @@ app.layout = html.Div([
     dcc.Dropdown(
         id='my-dropdown',
         options=[
+            {'label': '0050', 'value': '0050.TW'},
             {'label': 'TESLA', 'value': 'TSLA'},
             {'label': 'NVIDIA', 'value': 'NVDA'},
             {'label': 'AMD', 'value': 'AMD'},
             {'label': 'INTEL', 'value': 'INTC'},
             {'label': 'VTI', 'value': 'VTI'},
         ],
-        value='VTI'
+        value='0050.TW'
     ), 
     html.Br(),
     dcc.Graph(id='my-graph'),
@@ -95,7 +129,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
             id='interval-component',
-            interval=1*1000, # in milliseconds
+            interval=5*1000, # in milliseconds 
             n_intervals=0
     )
 ], style={'width': '600'})
@@ -115,8 +149,9 @@ def update_output_div(input_value1, input_value2):
 
 
 @app.callback(Output('my-graph', 'figure'), 
-            [Input('my-dropdown', 'value')])
-def update_graph(selected_dropdown_value):
+            [Input('my-dropdown', 'value'),
+            Input('interval-component', 'n_intervals')])
+def update_graph(selected_dropdown_value, n):
     df = web.DataReader(
         selected_dropdown_value,
         'yahoo',
@@ -134,12 +169,7 @@ def update_graph(selected_dropdown_value):
 @app.callback(Output('table', 'data'),
             [Input('interval-component', 'n_intervals')])
 def update_datatable(n):
-    l_of_stocks = ['TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
-    df_stock = web.DataReader(l_of_stocks, 'yahoo', dt(2018, 1, 1), dt.now())
-    df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
-    df_stock.columns =df_stock.columns.droplevel()
-    df_stock = df_stock.reset_index('Date').round(2)
-    df_stock['Date'] = df_stock['Date'].dt.date
+    df_stock = get_stockP(l_of_stocks)
     df_stock = df_stock.sort_values(by='Date', ascending=False)
     data=df_stock.to_dict('records')
     
