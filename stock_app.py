@@ -8,6 +8,8 @@ import dash_auth
 import pandas as pd
 from pandas_datareader import data as web
 from datetime import datetime as dt
+
+import plotly.express as px
 #import datetime
 #import investpy
 
@@ -113,6 +115,8 @@ app.layout = html.Div([
     html.Br(),
     dcc.Graph(id='my-graph'),
     html.Br(),
+    dcc.Graph(id='pie-chart'),
+    html.Br(),
     dcc.Markdown('**Stock Price**'),
     dash_table.DataTable(
     id='table',
@@ -169,6 +173,24 @@ def update_graph(selected_dropdown_value, n):
         }],
         'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
     }
+
+
+
+@app.callback(Output('pie-chart', 'figure'),
+            [Input('my-dropdown','value')])
+def update_pie_chart(my_dropdown):
+    dff = pd.DataFrame({'Stock': ['A', 'B'], 'Value': [6, 4]})
+
+    piechart=px.pie(
+            data_frame=dff,
+            names='Stock',
+            values='Value',
+            hole=.3,
+            )
+
+    return (piechart)
+
+
 
 @app.callback(Output('table', 'data'),
             [Input('interval-component', 'n_intervals')])
