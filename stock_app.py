@@ -70,7 +70,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'world':'hello'
 }
 
-l_of_stocks = ['0050.TW', 'TSLA', 'NVDA', 'AMD', 'INTL', 'VTI']
+l_of_stocks = ['0050.TW', 'VTI']
 df_stock = get_stockP(l_of_stocks)
 df_stock_return = get_stockP_return(df_stock)
 
@@ -98,14 +98,10 @@ app.layout = html.Div([
     dcc.Dropdown(
         id='my-dropdown',
         options=[
-            {'label': '0050', 'value': '0050.TW'},
-            {'label': 'TESLA', 'value': 'TSLA'},
-            {'label': 'NVIDIA', 'value': 'NVDA'},
-            {'label': 'AMD', 'value': 'AMD'},
-            {'label': 'INTEL', 'value': 'INTC'},
             {'label': 'VTI', 'value': 'VTI'},
+            {'label': '0050', 'value': '0050.TW'},
         ],
-        value='0050.TW'
+        value='VTI'
     ), 
     html.Br(),
     dcc.Graph(id='my-graph'),
@@ -129,7 +125,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
             id='interval-component',
-            interval=5*1000, # in milliseconds 
+            interval=10*1000, # in milliseconds 
             n_intervals=0
     )
 ], style={'width': '600'})
