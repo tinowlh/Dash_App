@@ -87,6 +87,13 @@ auth = dash_auth.BasicAuth(
 
 
 app.layout = html.Div([
+    html.Iframe(
+        id='my-static',
+        src='/assets/test_pic.png',
+        height=200,
+        width='100%',
+        style={'border': 'none', 'margin-top': 50}
+    ),
     html.Div(["Input1: ",
               dcc.Input(id='my-input1', value=1, type='number'),
               "Input2: ",
