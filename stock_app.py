@@ -10,6 +10,7 @@ from pandas_datareader import data as web
 from datetime import datetime as dt
 
 import plotly.express as px
+import plotly.graph_objects as go
 #import datetime
 #import investpy
 
@@ -96,6 +97,7 @@ app.layout = html.Div([
         width='100%',
         style={'border': 'none', 'margin-top': 50}
     ),
+    html.Br(),
     html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
               "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
               html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
@@ -112,6 +114,7 @@ app.layout = html.Div([
         ],
         value='VT'
     ), 
+    dcc.Graph(id='my-indicator'),
     html.Br(),
     dcc.Graph(id='my-graph'),
     html.Br(),
@@ -136,10 +139,34 @@ app.layout = html.Div([
     ),
     dcc.Interval(
             id='interval-component',
-            interval=10*1000, # in milliseconds 
+            interval=1800*1000, # in milliseconds 
             n_intervals=0
     )
 ], style={'width': '600'})
+
+
+# Callback
+
+@app.callback(Output('my-indicator', 'figure'),
+            [Input('my-dropdown','value')])
+def update_indicator(my_dropdown):
+    #dff = pd.DataFrame({'Stock': ['A', 'B'], 'Value': [6, 4]})
+
+    fig = go.Figure()
+    fig.add_trace(go.Indicator(
+        mode = "number",
+        value = 300,
+        domain = {'row': 0, 'column': 0}))
+    fig.update_layout(
+        grid = {'rows': 1, 'columns': 4, 'pattern': "independent"},
+        template = {'data' : {'indicator': [{
+            'title': {'text': "Growth%"},
+            'mode' : "number",
+            #'delta' : {'reference': 90}
+                            }]
+                            }})
+
+    return fig
 
 @app.callback(
     Output(component_id='my-output', component_property='children'),
@@ -166,14 +193,35 @@ def update_graph(selected_dropdown_value, n):
         dt(2018, 1, 1),
         dt.now()
     )
-    return {
-        'data': [{
-            'x': df.index,
-            'y': df.Close
-        }],
+    fig = px.line(df, x=df.index, y='Close', labels = {'y':'A'})
+    fig.update_xaxes(
+    rangeslider_visible=True,
+    rangeselector=dict(
+        buttons=list([
+            dict(count=1, label="1m", step="month", stepmode="backward"),
+            dict(count=6, label="6m", step="month", stepmode="backward"),
+            dict(count=1, label="YTD", step="year", stepmode="todate"),
+            dict(count=1, label="1y", step="year", stepmode="backward"),
+            dict(step="all")
+                      ])
+                       )
+                       )
+    fig.update_layout(legend=dict(y=0.5, traceorder='reversed', font_size=16))
+    return fig
+
+
+"""     fig = go.Figure(data=[go.Candlestick(x=df.index,
+                open=df['Open'], high=df['High'],
+                low=df['Low'], close=df['Close'])
+                     ])
+    fig.update_layout(xaxis_rangeslider_visible=False)
+    return fig """
+
+"""     return {
+        'data': [{'x': df.index,'y': df.Close}],
         'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
     }
-
+ """
 
 
 @app.callback(Output('pie-chart', 'figure'),
@@ -188,7 +236,7 @@ def update_pie_chart(my_dropdown):
             hole=.3,
             )
 
-    return (piechart)
+    return piechart
 
 
 
