@@ -70,7 +70,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'world':'hello'
 }
 
-l_of_stocks = ['0050.TW', 'VTI']
+l_of_stocks = ['VT', 'BND', '0050.TW']
 df_stock = get_stockP(l_of_stocks)
 df_stock_return = get_stockP_return(df_stock)
 
@@ -105,10 +105,11 @@ app.layout = html.Div([
     dcc.Dropdown(
         id='my-dropdown',
         options=[
-            {'label': 'VTI', 'value': 'VTI'},
+            {'label': 'VT', 'value': 'VT'},
+            {'label': 'BND', 'value': 'BND'},
             {'label': '0050', 'value': '0050.TW'},
         ],
-        value='VTI'
+        value='VT'
     ), 
     html.Br(),
     dcc.Graph(id='my-graph'),
