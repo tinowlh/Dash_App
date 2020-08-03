@@ -90,12 +90,6 @@ auth = dash_auth.BasicAuth(
 
 app.layout = html.Div([
     dcc.Markdown('Update every 30 seconds'),
-    dcc.Graph(id='my-indicator'),
-#    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
-#              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
-#              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
-#              html.Div(id='my-output')]),   
-#    html.Label('Stock Ticker'),
     dcc.Markdown('**Stock Ticker**'),
     dcc.Dropdown(
         id='my-dropdown',
@@ -111,6 +105,12 @@ app.layout = html.Div([
         ],
         value='VTI'
     ), 
+    dcc.Graph(id='my-indicator'),
+#    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
+#              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
+#              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
+#              html.Div(id='my-output')]),   
+#    html.Label('Stock Ticker'),
     dcc.DatePickerRange(
         id='my-date-picker-range',
         start_date = dt(2020, 1, 1),
@@ -172,7 +172,7 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         number = {'suffix': "%"},
         domain = {'row': 0, 'column': 0}))
     fig.update_layout(
-        grid = {'rows': 1, 'columns': 4, 'pattern': "independent"},
+        grid = {'rows': 1, 'columns': 6, 'pattern': "independent"},
         template = {'data' : {'indicator': [{
             'title': {'text': "Return"},
             'mode' : "number",
