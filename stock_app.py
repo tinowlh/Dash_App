@@ -89,6 +89,7 @@ auth = dash_auth.BasicAuth(
 
 
 app.layout = html.Div([
+    dcc.Markdown('Update every 30 seconds')
     dcc.Graph(id='my-indicator'),
 #    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
 #              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
@@ -142,7 +143,7 @@ app.layout = html.Div([
 #    ),
     dcc.Interval(
             id='interval-component',
-            interval=1800*1000, # in milliseconds 
+            interval=30*1000, # in milliseconds 
             n_intervals=0
     )
 ], style={'width': '600'})
