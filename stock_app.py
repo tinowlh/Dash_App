@@ -14,8 +14,6 @@ import plotly.graph_objects as go
 #import datetime
 #import investpy
 
-#import plotly.io as pio
-#pio.templates.default = "plotly_dark"
 
 
 #### Investing.com: Stock Price
@@ -49,7 +47,7 @@ import plotly.graph_objects as go
 
 
 
-def get_stockP(l_of_stocks, start = dt(2018, 1, 1), end = dt.now()):
+def get_stockP(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
     df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
     df_stock.columns =df_stock.columns.droplevel()
@@ -70,15 +68,16 @@ def get_stockP_return(df_stock):
 
 VALID_USERNAME_PASSWORD_PAIRS = {
     'hello': 'world',
-    'world':'hello'
+    'A':'BC'
 }
 
-l_of_stocks = ['VT', 'BND', '0050.TW']
+l_of_stocks = ['VTI', 'VEA', 'VWO', 'BND', 
+                'NVDA', 'AMD', 'INTC', '0050.TW']
 df_stock = get_stockP(l_of_stocks)
-df_stock_return = get_stockP_return(df_stock)
+#df_stock_return = get_stockP_return(df_stock)
 
 df_stock = df_stock.sort_values(by='Date', ascending=False)
-df_stock_return = df_stock_return.sort_values(by='Date', ascending=False)
+#df_stock_return = df_stock_return.sort_values(by='Date', ascending=False)
 
 app = dash.Dash('Hello World')
 server = app.server
@@ -90,35 +89,39 @@ auth = dash_auth.BasicAuth(
 
 
 app.layout = html.Div([
-    html.Iframe(
-        id='my-static',
-        src='/assets/test_pic.png',
-        height=200,
-        width='100%',
-        style={'border': 'none', 'margin-top': 50}
-    ),
-    html.Br(),
-    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
-              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
-              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
-              html.Div(id='my-output')]),
-    html.Br(),          
-    #html.Label('Stock Ticker'),
+    dcc.Graph(id='my-indicator'),
+#    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
+#              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
+#              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
+#              html.Div(id='my-output')]),   
+#    html.Label('Stock Ticker'),
     dcc.Markdown('**Stock Ticker**'),
     dcc.Dropdown(
         id='my-dropdown',
         options=[
-            {'label': 'VT', 'value': 'VT'},
+            {'label': 'VTI', 'value': 'VTI'},
+            {'label': 'VEA', 'value': 'VEA'},
+            {'label': 'VWO', 'value': 'VWO'},
             {'label': 'BND', 'value': 'BND'},
+            {'label': 'NVDA', 'value': 'NVDA'},
+            {'label': 'AMD', 'value': 'AMD'},
+            {'label': 'INTC', 'value': 'INTC'},
             {'label': '0050', 'value': '0050.TW'},
         ],
-        value='VT'
+        value='VTI'
     ), 
-    dcc.Graph(id='my-indicator'),
+    dcc.DatePickerRange(
+        id='my-date-picker-range',
+        start_date = dt(2020, 1, 1),
+        min_date_allowed=dt(2018, 1, 1),
+        max_date_allowed=dt.now(),
+        initial_visible_month=dt.now(),
+        end_date=dt.now().date()
+    ),
     html.Br(),
     dcc.Graph(id='my-graph'),
     html.Br(),
-    dcc.Graph(id='pie-chart'),
+#    dcc.Graph(id='pie-chart'),
     html.Br(),
     dcc.Markdown('**Stock Price**'),
     dash_table.DataTable(
@@ -129,14 +132,14 @@ app.layout = html.Div([
     sort_action="native"
     ),
     html.Br(),
-    dcc.Markdown('**Percentage Change**'),
-    dash_table.DataTable(
-    id='table_return',
-    columns=[{"name": i, "id": i} for i in df_stock_return.columns],
-    data=df_stock_return.to_dict('records'),
-    page_size = 20,
-    sort_action="native"
-    ),
+#    dcc.Markdown('**Percentage Change**'),
+#    dash_table.DataTable(
+#    id='table_return',
+#    columns=[{"name": i, "id": i} for i in df_stock_return.columns],
+#    data=df_stock_return.to_dict('records'),
+#    page_size = 20,
+#    sort_action="native"
+#    ),
     dcc.Interval(
             id='interval-component',
             interval=1800*1000, # in milliseconds 
@@ -145,30 +148,39 @@ app.layout = html.Div([
 ], style={'width': '600'})
 
 
-# Callback
+### Callback
 
+#indicator
 @app.callback(Output('my-indicator', 'figure'),
-            [Input('my-dropdown','value')])
-def update_indicator(my_dropdown):
-    #dff = pd.DataFrame({'Stock': ['A', 'B'], 'Value': [6, 4]})
-
+            [Input('my-dropdown', 'value'),
+            Input('my-date-picker-range', 'start_date'),
+            Input('my-date-picker-range', 'end_date'),
+            Input('interval-component', 'n_intervals')])
+def update_indicator(selected_dropdown_value, start_date, end_date, n):
+    df = web.DataReader(
+        selected_dropdown_value,
+        'yahoo',
+        start_date,
+        end_date
+        )
+    stock_return = round(((df.iloc[-1,3] - df.iloc[0,3]) / df.iloc[0,3]) * 100, 2)
     fig = go.Figure()
     fig.add_trace(go.Indicator(
         mode = "number",
-        value = 300,
+        value = stock_return,
+        number = {'suffix': "%"},
         domain = {'row': 0, 'column': 0}))
     fig.update_layout(
         grid = {'rows': 1, 'columns': 4, 'pattern': "independent"},
         template = {'data' : {'indicator': [{
-            'title': {'text': "Growth%"},
+            'title': {'text': "Return"},
             'mode' : "number",
-            #'delta' : {'reference': 90}
+            'delta' : {'reference': 0}
                             }]
                             }})
-
     return fig
 
-@app.callback(
+""" @app.callback(
     Output(component_id='my-output', component_property='children'),
     [Input('submit-button-state', 'n_clicks')],
     [State('my-input1', 'value'),
@@ -180,51 +192,29 @@ def update_output_div(n_clicks, input_value1, input_value2):
     if input_value2 == None:
         input_value2 = 0 
     v = (input_value1 - input_value2) * 100
-    return 'Output: {} (The Button has been pressed {} times)'.format(v, n_clicks)
+    return 'Output: {} (The Button has been pressed {} times)'.format(v, n_clicks) """
 
-
+# Line Chart
 @app.callback(Output('my-graph', 'figure'), 
             [Input('my-dropdown', 'value'),
+            Input('my-date-picker-range', 'start_date'),
+            Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
-def update_graph(selected_dropdown_value, n):
+def update_graph(selected_dropdown_value, start_date, end_date, n):
     df = web.DataReader(
         selected_dropdown_value,
         'yahoo',
-        dt(2018, 1, 1),
-        dt.now()
+        start_date,
+        end_date
     )
-    fig = px.line(df, x=df.index, y='Close', labels = {'y':'A'})
-    fig.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-                      ])
-                       )
-                       )
-    fig.update_layout(legend=dict(y=0.5, traceorder='reversed', font_size=16))
-    return fig
-
-
-"""     fig = go.Figure(data=[go.Candlestick(x=df.index,
-                open=df['Open'], high=df['High'],
-                low=df['Low'], close=df['Close'])
-                     ])
-    fig.update_layout(xaxis_rangeslider_visible=False)
-    return fig """
-
-"""     return {
+    return {
         'data': [{'x': df.index,'y': df.Close}],
         'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
     }
- """
 
 
-@app.callback(Output('pie-chart', 'figure'),
+
+""" @app.callback(Output('pie-chart', 'figure'),
             [Input('my-dropdown','value')])
 def update_pie_chart(my_dropdown):
     dff = pd.DataFrame({'Stock': ['A', 'B'], 'Value': [6, 4]})
@@ -236,14 +226,16 @@ def update_pie_chart(my_dropdown):
             hole=.3,
             )
 
-    return piechart
+    return piechart """
 
 
 
 @app.callback(Output('table', 'data'),
-            [Input('interval-component', 'n_intervals')])
-def update_datatable(n):
-    df_stock = get_stockP(l_of_stocks)
+            [Input('my-date-picker-range', 'start_date'),
+            Input('my-date-picker-range', 'end_date'),
+            Input('interval-component', 'n_intervals')])
+def update_datatable(start_date, end_date, n):
+    df_stock = get_stockP(l_of_stocks, start_date, end_date)
     df_stock = df_stock.sort_values(by='Date', ascending=False)
     data=df_stock.to_dict('records')
     
