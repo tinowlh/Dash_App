@@ -87,7 +87,8 @@ VALID_USERNAME_PASSWORD_PAIRS = {
 }
 
 l_of_stocks = ['VTI', 'VEA', 'VWO', 'BND', 
-                'NVDA', 'AMD', 'INTC', '0050.TW']
+               'NVDA', 'AMD', 'INTC', '0050.TW',
+               'ESPO', 'SKYY' ]
 df_stock = get_stockP(l_of_stocks)
 #df_stock_return = get_stockP_return(df_stock)
 
@@ -116,7 +117,9 @@ app.layout = html.Div([
             {'label': 'NVDA', 'value': 'NVDA'},
             {'label': 'AMD', 'value': 'AMD'},
             {'label': 'INTC', 'value': 'INTC'},
-            {'label': '0050', 'value': '0050.TW'}
+            {'label': '0050', 'value': '0050.TW'},
+            {'label': 'ESPO', 'value': 'ESPO'},
+            {'label': 'SKYY', 'value': 'SKYY'}
         ],
         value='VTI'
     ), 
@@ -270,7 +273,7 @@ def update_pie_chart(my_dropdown):
     return piechart """
 
 
-
+# Table
 @app.callback(Output('table', 'data'),
             [Input('my-date-picker-range', 'start_date'),
             Input('my-date-picker-range', 'end_date'),
