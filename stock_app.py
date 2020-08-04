@@ -16,15 +16,40 @@ import plotly.graph_objects as go
 #import investpy
 
 
-# testing
-#df = web.DataReader(
-#    'VT',
-#    'yahoo',
-#    dt(2018,1,1),
-#    dt.now()
-#)
+
+## testing
+#
+#
+#def get_stockP(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
+#    df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
+#    df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
+#    df_stock.columns =df_stock.columns.droplevel()
+#    df_stock = df_stock.reset_index('Date').round(2)
+#    df_stock['Date'] = df_stock['Date'].dt.date
+#    return df_stock
+#
+#ls = ['VTI', 'VT']
+#
+#df = web.DataReader(ls, 'yahoo', dt(2018,1,1), dt.now())
+#df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
+#df.columns =df.columns.droplevel()
+#df = df.reset_index('Date')
+#df['Date'] = df['Date'].dt.date
+#df_unpivot = df.melt(id_vars=['Date'],
+#                     var_name= 'Stock', 
+#                     value_name='Price')
+#
+#
+#
+#
+#
+#daily_return = df['Close'].pct_change()
+#daily_cum_return = (1 + daily_return).cumprod()
+#
 #
 #ttl_return = (df.iloc[-1,3] - df.iloc[0,3]) / df.iloc[0,3]
+#
+#
 #
 #annualized_return = ((1 + ttl_return) ** (365/ len(df))) -1
 
@@ -75,6 +100,18 @@ def get_stockP_return(df_stock):
     df_stock_return = df_stock.pct_change().round(4)
     df_stock_return = df_stock_return.reset_index('Date')
     return df_stock_return
+
+
+def get_stockP_bmrk(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
+    df = web.DataReader(l_of_stocks, 'yahoo', start, end)
+    df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
+    df.columns =df.columns.droplevel()
+    df = df.reset_index('Date')
+    df['Date'] = df['Date'].dt.date
+    df = df.melt(id_vars=['Date'],
+                      var_name= 'Stock', 
+                      value_name='Price')
+    return df
 
 
 
@@ -149,7 +186,9 @@ app.layout = html.Div(
     #    html.Label('Stock Ticker'),
         dcc.Graph(id='my-graph'),
         html.Br(),
+        dcc.Graph(id='graph-benchmark'),
     #    dcc.Graph(id='pie-chart'),
+        html.Br(),
         dcc.Markdown('**Stock Price**'),
         dash_table.DataTable(
         id='table',
@@ -266,6 +305,18 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
         'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
     }
 
+
+# Line Chart (Benchmark)
+@app.callback(Output('graph-benchmark', 'figure'), 
+            [Input('my-dropdown', 'value'),
+            Input('my-date-picker-range', 'start_date'),
+            Input('my-date-picker-range', 'end_date'),
+            Input('interval-component', 'n_intervals')])
+def update_graph_bmrk(selected_dropdown_value, start_date, end_date, n):
+    ls = ['VTI', selected_dropdown_value]
+    df = get_stockP_bmrk(ls, start_date, end_date)
+    fig = px.line(df, x="Date", y="Price", color='Stock')
+    return fig
 
 
 """ @app.callback(Output('pie-chart', 'figure'),
