@@ -17,41 +17,27 @@ import plotly.graph_objects as go
 
 
 
-## testing
-#
-#
-#def get_stockP(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-#    df_stock = web.DataReader(l_of_stocks, 'yahoo', start, end)
-#    df_stock = df_stock.loc[:, df_stock.columns.get_level_values(0).isin({'Close'})]
-#    df_stock.columns =df_stock.columns.droplevel()
-#    df_stock = df_stock.reset_index('Date').round(2)
-#    df_stock['Date'] = df_stock['Date'].dt.date
-#    return df_stock
-#
+# testing
 #ls = ['VTI', 'VT']
 #
-#df = web.DataReader(ls, 'yahoo', dt(2018,1,1), dt.now())
-#df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
-#df.columns =df.columns.droplevel()
-#df = df.reset_index('Date')
-#df['Date'] = df['Date'].dt.date
-#df_unpivot = df.melt(id_vars=['Date'],
-#                     var_name= 'Stock', 
-#                     value_name='Price')
+#def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
+#    df = web.DataReader(ls, 'yahoo', dt(2018,1,1), dt.now())
+#    df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
+#    df.columns =df.columns.droplevel()
+#    df_daily_return = df.pct_change()
+#    df_daily_cum_return = (1 + df_daily_return).cumprod()
+#    df_daily_cum_return = df_daily_cum_return.reset_index('Date')
+#    #df_daily_cum_return['Date'] = df_daily_cum_return['Date'].dt.date
+#    df_unpivot = df_daily_cum_return.melt(id_vars='Date',
+#                         var_name= 'Stock', 
+#                         value_name='CumReturn')
+#    return df_unpivot
 #
 #
+#ls = ['VTI', 'VT']
+#df = get_cum_return(ls)
 #
-#
-#
-#daily_return = df['Close'].pct_change()
-#daily_cum_return = (1 + daily_return).cumprod()
-#
-#
-#ttl_return = (df.iloc[-1,3] - df.iloc[0,3]) / df.iloc[0,3]
-#
-#
-#
-#annualized_return = ((1 + ttl_return) ** (365/ len(df))) -1
+
 
 
 
@@ -102,16 +88,18 @@ def get_stockP_return(df_stock):
     return df_stock_return
 
 
-def get_stockP_bmrk(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
+def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df = web.DataReader(l_of_stocks, 'yahoo', start, end)
     df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
     df.columns =df.columns.droplevel()
-    df = df.reset_index('Date')
-    df['Date'] = df['Date'].dt.date
-    df = df.melt(id_vars=['Date'],
-                      var_name= 'Stock', 
-                      value_name='Price')
-    return df
+    df_daily_return = df.pct_change()
+    df_daily_cum_return = (1 + df_daily_return).cumprod()
+    df_daily_cum_return = df_daily_cum_return.reset_index('Date')
+    #df_daily_cum_return['Date'] = df_daily_cum_return['Date'].dt.date
+    df_unpivot = df_daily_cum_return.melt(id_vars='Date',
+                         var_name= 'Stock/ETF', 
+                         value_name='CumReturn')
+    return df_unpivot
 
 
 
@@ -123,7 +111,8 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'A':'BC'
 }
 
-l_of_stocks = ['VTI', 'VEA', 'VWO', 'BND', 
+# df for table
+l_of_stocks = ['VTI', 'VEA', 'VWO', 'BND', 'VT',
                'NVDA', 'AMD', 'INTC', '0050.TW',
                'ESPO', 'SKYY' ]
 df_stock = get_stockP(l_of_stocks)
@@ -154,6 +143,7 @@ app.layout = html.Div(
                             {'label': 'VTI', 'value': 'VTI'},
                             {'label': 'VEA', 'value': 'VEA'},
                             {'label': 'VWO', 'value': 'VWO'},
+                            {'label': 'VT', 'value': 'VT'},
                             {'label': 'BND', 'value': 'BND'},
                             {'label': 'NVDA', 'value': 'NVDA'},
                             {'label': 'AMD', 'value': 'AMD'},
@@ -234,7 +224,7 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
     annualized_return = ((1 + ttl_return) ** (365/ len(df))) -1
     sr_return = df['Close'].pct_change()
     volatility = sr_return.std() * np.sqrt(250)
-    sharp_ratio = (annualized_return - 0) / volatility # risk-free rate = 0
+    sharpe_ratio = (annualized_return - 0) / volatility # risk-free rate = 0
     
     fig = go.Figure()
     fig.add_trace(go.Indicator(
@@ -252,9 +242,9 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         domain = {'row': 0, 'column': 1}))
     
     fig.add_trace(go.Indicator(
-        title = {'text': "Sharp Ratio"},   
+        title = {'text': "Sharpe Ratio"},   
         mode = "number",
-        value = round(sharp_ratio,2),
+        value = round(sharpe_ratio,2),
         domain = {'row': 0, 'column': 2}))
     
     fig.update_layout(
@@ -313,9 +303,12 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_graph_bmrk(selected_dropdown_value, start_date, end_date, n):
-    ls = ['VTI', selected_dropdown_value]
-    df = get_stockP_bmrk(ls, start_date, end_date)
-    fig = px.line(df, x="Date", y="Price", color='Stock')
+    ls = ['VT', selected_dropdown_value]
+    df = get_cum_return(ls, start_date, end_date)
+    fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
+                 title="Cumulative Return"
+                 )
+    fig.update_layout(height=500)           
     return fig
 
 
