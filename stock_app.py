@@ -143,7 +143,7 @@ app.layout = html.Div([
 #    ),
     dcc.Interval(
             id='interval-component',
-            interval=30*1000, # in milliseconds 
+            interval=30*1000, # in milliseconds 30sec update
             n_intervals=0
     )
 ], style={'width': '600'})
@@ -172,13 +172,19 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         number = {'suffix': "%"},
         domain = {'row': 0, 'column': 0}))
     fig.update_layout(
-        grid = {'rows': 1, 'columns': 6, 'pattern': "independent"},
+        paper_bgcolor="#EBF5FB",
+        autosize=True,
+        margin=dict(l=50,r=50,b=100,t=100,pad=4),
+#        width=300,
+#        height=300,
+        grid = {'rows': 1, 'columns': 1, 'pattern': "independent"},
         template = {'data' : {'indicator': [{
-            'title': {'text': "Return"},
-            'mode' : "number",
-            'delta' : {'reference': 0}
-                            }]
-                            }})
+                                            'title': {'text': "Return"},
+                                            'mode' : "number",
+                                            'delta' : {'reference': 0}
+                                            }]
+                             }
+                    })
     return fig
 
 """ @app.callback(
