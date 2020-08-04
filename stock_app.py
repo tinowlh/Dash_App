@@ -8,6 +8,7 @@ import dash_auth
 import pandas as pd
 from pandas_datareader import data as web
 from datetime import datetime as dt
+import numpy as np
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -176,8 +177,12 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         start_date,
         end_date
         )
+
     ttl_return = (df.iloc[-1,3] - df.iloc[0,3]) / df.iloc[0,3]
     annualized_return = ((1 + ttl_return) ** (365/ len(df))) -1
+    sr_return = df['Close'].pct_change()
+    volatility = sr_return.std() * np.sqrt(250)
+    sharpe_ratio = (annualized_return - 0) / volatility # risk-free rate = 0
     
     fig = go.Figure()
     fig.add_trace(go.Indicator(
@@ -194,13 +199,19 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         number = {'suffix': "%"},
         domain = {'row': 0, 'column': 1}))
     
+    fig.add_trace(go.Indicator(
+        title = {'text': "Sharpe Ratio"},   
+        mode = "number",
+        value = round(sharpe_ratio,2),
+        domain = {'row': 0, 'column': 2}))
+    
     fig.update_layout(
         paper_bgcolor="#EBF5FB",
         autosize=True,
         margin=dict(l=50,r=50,b=50,t=50,pad=5),
 #        width=300,
         height=200,
-        grid = {'rows': 1, 'columns': 2, 'pattern': "independent"},
+        grid = {'rows': 1, 'columns': 3, 'pattern': "independent"},
         template = {'data' : {'indicator': [{
                                             'title': {'text': "Return"},
                                             'mode' : "number",
