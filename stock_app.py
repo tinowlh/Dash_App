@@ -104,65 +104,75 @@ auth = dash_auth.BasicAuth(
 )
 
 
-app.layout = html.Div([
-    dcc.Markdown('Update every 30 seconds'),
-    dcc.Markdown('**Stock Ticker**'),
-    dcc.Dropdown(
-        id='my-dropdown',
-        options=[
-            {'label': 'VTI', 'value': 'VTI'},
-            {'label': 'VEA', 'value': 'VEA'},
-            {'label': 'VWO', 'value': 'VWO'},
-            {'label': 'BND', 'value': 'BND'},
-            {'label': 'NVDA', 'value': 'NVDA'},
-            {'label': 'AMD', 'value': 'AMD'},
-            {'label': 'INTC', 'value': 'INTC'},
-            {'label': '0050', 'value': '0050.TW'},
-            {'label': 'ESPO', 'value': 'ESPO'},
-            {'label': 'SKYY', 'value': 'SKYY'}
-        ],
-        value='VTI'
-    ), 
-    dcc.DatePickerRange(
-        id='my-date-picker-range',
-        start_date = dt(2020, 1, 1),
-        min_date_allowed=dt(2018, 1, 1),
-        max_date_allowed=dt.now(),
-        initial_visible_month=dt(2020, 1, 1),
-        end_date=dt.now().date()
-    ),
-    dcc.Graph(id='my-indicator'),
-#    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
-#              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
-#              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
-#              html.Div(id='my-output')]),   
-#    html.Label('Stock Ticker'),
-    dcc.Graph(id='my-graph'),
-    html.Br(),
-#    dcc.Graph(id='pie-chart'),
-    dcc.Markdown('**Stock Price**'),
-    dash_table.DataTable(
-    id='table',
-    columns=[{"name": i, "id": i} for i in df_stock.columns],
-    data=df_stock.to_dict('records'),
-    page_size = 20,
-    sort_action="native"
-    ),
-    html.Br(),
-#    dcc.Markdown('**Percentage Change**'),
-#    dash_table.DataTable(
-#    id='table_return',
-#    columns=[{"name": i, "id": i} for i in df_stock_return.columns],
-#    data=df_stock_return.to_dict('records'),
-#    page_size = 20,
-#    sort_action="native"
-#    ),
-    dcc.Interval(
-            id='interval-component',
-            interval=30*1000, # in milliseconds 30sec update
-            n_intervals=0
-    )
-], style={'width': '600'})
+app.layout = html.Div(
+    children=[
+        dcc.Markdown('Update every 30 seconds'),
+        dcc.Markdown('**Stock Ticker**'),
+        html.Div(
+                children=[
+                    html.Div(
+                        dcc.Dropdown(
+                        id='my-dropdown',
+                        options=[
+                            {'label': 'VTI', 'value': 'VTI'},
+                            {'label': 'VEA', 'value': 'VEA'},
+                            {'label': 'VWO', 'value': 'VWO'},
+                            {'label': 'BND', 'value': 'BND'},
+                            {'label': 'NVDA', 'value': 'NVDA'},
+                            {'label': 'AMD', 'value': 'AMD'},
+                            {'label': 'INTC', 'value': 'INTC'},
+                            {'label': '0050', 'value': '0050.TW'},
+                            {'label': 'ESPO', 'value': 'ESPO'},
+                            {'label': 'SKYY', 'value': 'SKYY'}
+                        ],
+                        value='VTI'
+                                ) #, style={'display':'inline-block', 'width': '50%'}
+                            ),
+                    html.Div(
+                        dcc.DatePickerRange(
+                            id='my-date-picker-range',
+                            start_date = dt(2020, 1, 1),
+                            min_date_allowed=dt(2018, 1, 1),
+                            max_date_allowed=dt.now(),
+                            initial_visible_month=dt(2020, 1, 1),
+                            end_date=dt.now().date()
+                                        )
+                                    #, style={'display':'inline-block', 'width': '50%'}
+                              )
+                         ]
+                  ),
+        dcc.Graph(id='my-indicator'),
+    #    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
+    #              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
+    #              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
+    #              html.Div(id='my-output')]),   
+    #    html.Label('Stock Ticker'),
+        dcc.Graph(id='my-graph'),
+        html.Br(),
+    #    dcc.Graph(id='pie-chart'),
+        dcc.Markdown('**Stock Price**'),
+        dash_table.DataTable(
+        id='table',
+        columns=[{"name": i, "id": i} for i in df_stock.columns],
+        data=df_stock.to_dict('records'),
+        page_size = 20,
+        sort_action="native"
+        ),
+        html.Br(),
+    #    dcc.Markdown('**Percentage Change**'),
+    #    dash_table.DataTable(
+    #    id='table_return',
+    #    columns=[{"name": i, "id": i} for i in df_stock_return.columns],
+    #    data=df_stock_return.to_dict('records'),
+    #    page_size = 20,
+    #    sort_action="native"
+    #    ),
+        dcc.Interval(
+                id='interval-component',
+                interval=30*1000, # in milliseconds 30sec update
+                n_intervals=0
+                    )
+            ], style={'width': '600'})
 
 
 ### Callback ###
