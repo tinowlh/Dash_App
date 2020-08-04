@@ -15,6 +15,20 @@ import plotly.graph_objects as go
 #import investpy
 
 
+# testing
+#df = web.DataReader(
+#    'VT',
+#    'yahoo',
+#    dt(2018,1,1),
+#    dt.now()
+#)
+#
+#ttl_return = (df.iloc[-1,3] - df.iloc[0,3]) / df.iloc[0,3]
+#
+#annualized_return = ((1 + ttl_return) ** (365/ len(df))) -1
+
+
+
 
 #### Investing.com: Stock Price
 #def get_stock_price (stock, from_date, to_date, country= 'united states'):
@@ -101,29 +115,27 @@ app.layout = html.Div([
             {'label': 'NVDA', 'value': 'NVDA'},
             {'label': 'AMD', 'value': 'AMD'},
             {'label': 'INTC', 'value': 'INTC'},
-            {'label': '0050', 'value': '0050.TW'},
+            {'label': '0050', 'value': '0050.TW'}
         ],
         value='VTI'
     ), 
+    dcc.DatePickerRange(
+        id='my-date-picker-range',
+        start_date = dt(2020, 1, 1),
+        min_date_allowed=dt(2018, 1, 1),
+        max_date_allowed=dt.now(),
+        initial_visible_month=dt(2020, 1, 1),
+        end_date=dt.now().date()
+    ),
     dcc.Graph(id='my-indicator'),
 #    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
 #              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
 #              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
 #              html.Div(id='my-output')]),   
 #    html.Label('Stock Ticker'),
-    dcc.DatePickerRange(
-        id='my-date-picker-range',
-        start_date = dt(2020, 1, 1),
-        min_date_allowed=dt(2018, 1, 1),
-        max_date_allowed=dt.now(),
-        initial_visible_month=dt.now(),
-        end_date=dt.now().date()
-    ),
-    html.Br(),
     dcc.Graph(id='my-graph'),
     html.Br(),
 #    dcc.Graph(id='pie-chart'),
-    html.Br(),
     dcc.Markdown('**Stock Price**'),
     dash_table.DataTable(
     id='table',
@@ -149,7 +161,7 @@ app.layout = html.Div([
 ], style={'width': '600'})
 
 
-### Callback
+### Callback ###
 
 #indicator
 @app.callback(Output('my-indicator', 'figure'),
@@ -164,20 +176,31 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         start_date,
         end_date
         )
-    stock_return = round(((df.iloc[-1,3] - df.iloc[0,3]) / df.iloc[0,3]) * 100, 2)
+    ttl_return = (df.iloc[-1,3] - df.iloc[0,3]) / df.iloc[0,3]
+    annualized_return = ((1 + ttl_return) ** (365/ len(df))) -1
+    
     fig = go.Figure()
     fig.add_trace(go.Indicator(
+        title = {'text': "Total Return"},    
         mode = "number",
-        value = stock_return,
+        value = round(ttl_return * 100,2),
         number = {'suffix': "%"},
         domain = {'row': 0, 'column': 0}))
+    
+    fig.add_trace(go.Indicator(
+        title = {'text': "Annualized Return"},   
+        mode = "number",
+        value = round(annualized_return * 100,2),
+        number = {'suffix': "%"},
+        domain = {'row': 0, 'column': 1}))
+    
     fig.update_layout(
         paper_bgcolor="#EBF5FB",
         autosize=True,
-        margin=dict(l=50,r=50,b=100,t=100,pad=4),
+        margin=dict(l=50,r=50,b=50,t=50,pad=5),
 #        width=300,
-#        height=300,
-        grid = {'rows': 1, 'columns': 1, 'pattern': "independent"},
+        height=200,
+        grid = {'rows': 1, 'columns': 2, 'pattern': "independent"},
         template = {'data' : {'indicator': [{
                                             'title': {'text': "Return"},
                                             'mode' : "number",
