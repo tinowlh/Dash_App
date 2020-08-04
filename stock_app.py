@@ -185,7 +185,7 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
     annualized_return = ((1 + ttl_return) ** (365/ len(df))) -1
     sr_return = df['Close'].pct_change()
     volatility = sr_return.std() * np.sqrt(250)
-    sharpe_ratio = (annualized_return - 0) / volatility # risk-free rate = 0
+    sharp_ratio = (annualized_return - 0) / volatility # risk-free rate = 0
     
     fig = go.Figure()
     fig.add_trace(go.Indicator(
@@ -203,9 +203,9 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         domain = {'row': 0, 'column': 1}))
     
     fig.add_trace(go.Indicator(
-        title = {'text': "Sharpe Ratio"},   
+        title = {'text': "Sharp Ratio"},   
         mode = "number",
-        value = round(sharpe_ratio,2),
+        value = round(sharp_ratio,2),
         domain = {'row': 0, 'column': 2}))
     
     fig.update_layout(
