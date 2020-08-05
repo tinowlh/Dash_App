@@ -313,7 +313,7 @@ def update_graph_bmrk(selected_dropdown_value, start_date, end_date, n):
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Cumulative Return"
                  )
-    fig.update_layout(height=500, template='seaborn')           
+    fig.update_layout(height=500, template='plotly')           
     return fig
 
 
