@@ -112,7 +112,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
 }
 
 # df for table
-l_of_stocks = ['VTI', 'VEA', 'VWO', 'BND', 'VT',
+l_of_stocks = ['VTI', 'VEA', 'VWO', 'BND', 'VOO', 'VT',
                'NVDA', 'AMD', 'INTC', '0050.TW',
                'ESPO', 'SKYY' ]
 df_stock = get_stockP(l_of_stocks)
@@ -143,6 +143,7 @@ app.layout = html.Div(
                             {'label': 'VTI', 'value': 'VTI'},
                             {'label': 'VEA', 'value': 'VEA'},
                             {'label': 'VWO', 'value': 'VWO'},
+                            {'label': 'VOO', 'value': 'VOO'},
                             {'label': 'VT', 'value': 'VT'},
                             {'label': 'BND', 'value': 'BND'},
                             {'label': 'NVDA', 'value': 'NVDA'},
@@ -303,8 +304,10 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_graph_bmrk(selected_dropdown_value, start_date, end_date, n):
-    ls = ['VT', selected_dropdown_value]
+    bmark = 'VOO'
+    ls = [bmark, selected_dropdown_value]
     df = get_cum_return(ls, start_date, end_date)
+    df['Stock/ETF'] = df['Stock/ETF'].str.replace('VOO', 'VOO (S&P 500)')
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Cumulative Return"
                  )
