@@ -12,10 +12,12 @@ import numpy as np
 
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio #themes
+
 #import datetime
 #import investpy
 
-
+#pio.templates
 
 # testing
 #ls = ['VTI', 'VT']
@@ -202,7 +204,7 @@ app.layout = html.Div(
                 interval=30*1000, # in milliseconds 30sec update
                 n_intervals=0
                     )
-            ], style={'width': '600'})
+            ], style={'width': 'auto'})
 
 
 ### Callback ###
@@ -311,7 +313,7 @@ def update_graph_bmrk(selected_dropdown_value, start_date, end_date, n):
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Cumulative Return"
                  )
-    fig.update_layout(height=500)           
+    fig.update_layout(height=500, template='seaborn')           
     return fig
 
 
