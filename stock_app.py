@@ -112,7 +112,7 @@ auth = dash_auth.BasicAuth(
 
 app.layout = html.Div(
     children=[
-        dcc.Markdown('Update every 30 seconds'),
+        dcc.Markdown('Update every 30 seconds',style={'textAlign': 'right'}),
         dcc.Markdown('**Stock Ticker**'),
         html.Div(
                 children=[
