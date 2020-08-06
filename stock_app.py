@@ -19,28 +19,6 @@ import plotly.io as pio #themes
 
 #pio.templates
 
-# testing
-#ls = ['VTI', 'VT']
-#
-#def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-#    df = web.DataReader(ls, 'yahoo', dt(2018,1,1), dt.now())
-#    df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
-#    df.columns =df.columns.droplevel()
-#    df_daily_return = df.pct_change()
-#    df_daily_cum_return = (1 + df_daily_return).cumprod()
-#    df_daily_cum_return = df_daily_cum_return.reset_index('Date')
-#    #df_daily_cum_return['Date'] = df_daily_cum_return['Date'].dt.date
-#    df_unpivot = df_daily_cum_return.melt(id_vars='Date',
-#                         var_name= 'Stock', 
-#                         value_name='CumReturn')
-#    return df_unpivot
-#
-#
-#ls = ['VTI', 'VT']
-#df = get_cum_return(ls)
-#
-
-
 
 
 
@@ -161,7 +139,7 @@ app.layout = html.Div(
                     html.Div(
                         dcc.DatePickerRange(
                             id='my-date-picker-range',
-                            start_date = dt(2020, 1, 1),
+                            start_date = dt(2019, 1, 1),
                             min_date_allowed=dt(2018, 1, 1),
                             max_date_allowed=dt.now(),
                             initial_visible_month=dt(2020, 1, 1),
@@ -179,6 +157,42 @@ app.layout = html.Div(
     #    html.Label('Stock Ticker'),
         dcc.Graph(id='my-graph'),
         html.Br(),
+        html.Div(
+                children=[
+                    html.Div(
+                        html.Label(["Benchmark",
+                            dcc.Dropdown(
+                            id='dropdown_benchmark1',
+                            options=[
+                                {'label': 'VTI (US Total Stock)', 'value': 'VTI'},
+                                {'label': 'VOO (S&P 500)', 'value': 'VOO'},
+                                {'label': 'VT (Total World Stock)', 'value': 'VT'},
+                                {'label': 'BND (US Total Bond)', 'value': 'BND'},
+                            ],
+                            value='VOO'
+                                    )])
+                            ,style={'display':'inline-block', 'width': '50%'}
+                            ),
+                     html.Div(
+                        html.Label(["Stock/ETF",
+                            dcc.Dropdown(
+                            id='dropdown_benchmark2',
+                            options=[
+                                {'label': '0050', 'value': '0050.TW'},
+                                {'label': 'VEA', 'value': 'VEA'},
+                                {'label': 'VWO', 'value': 'VWO'},
+                                {'label': 'NVDA', 'value': 'NVDA'},
+                                {'label': 'AMD', 'value': 'AMD'},
+                                {'label': 'INTC', 'value': 'INTC'},
+                                {'label': 'ESPO', 'value': 'ESPO'},
+                                {'label': 'SKYY', 'value': 'SKYY'}
+                            ],
+                            value='0050.TW'
+                                    )])
+                            ,style={'display':'inline-block', 'width': '50%'}
+                            )
+                        ]
+                 ),        
         dcc.Graph(id='graph-benchmark'),
     #    dcc.Graph(id='pie-chart'),
         html.Br(),
@@ -301,13 +315,13 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
 
 # Line Chart (Benchmark)
 @app.callback(Output('graph-benchmark', 'figure'), 
-            [Input('my-dropdown', 'value'),
+            [Input('dropdown_benchmark1', 'value'),
+            Input('dropdown_benchmark2', 'value'),
             Input('my-date-picker-range', 'start_date'),
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
-def update_graph_bmrk(selected_dropdown_value, start_date, end_date, n):
-    bmark = 'VOO'
-    ls = [bmark, selected_dropdown_value]
+def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, end_date, n):
+    ls = [dropdown_bmak1_value, dropdown_bmak2_value]
     df = get_cum_return(ls, start_date, end_date)
     df['Stock/ETF'] = df['Stock/ETF'].str.replace('VOO', 'VOO (S&P 500)')
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
