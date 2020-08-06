@@ -142,7 +142,7 @@ app.layout = html.Div(
                             start_date = dt(2019, 1, 1),
                             min_date_allowed=dt(2018, 1, 1),
                             max_date_allowed=dt.now(),
-                            initial_visible_month=dt(2020, 1, 1),
+                            initial_visible_month=dt(2019, 1, 1),
                             end_date=dt.now().date()
                                         )
                                     #, style={'display':'inline-block', 'width': '50%'}
