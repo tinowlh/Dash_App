@@ -127,6 +127,7 @@ app.layout = html.Div(
                     html.Div(
                         dcc.DatePickerRange(
                             id='my-date-picker-range',
+                            display_format='YYYY-MM-DD',
                             start_date = dt(2019, 1, 1),
                             min_date_allowed=dt(2018, 1, 1),
                             max_date_allowed=dt.now(),
@@ -241,7 +242,7 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
     fig.update_layout(
         paper_bgcolor="#EBF5FB",
         autosize=True,
-        margin=dict(l=50,r=50,b=50,t=50,pad=5),
+        margin=dict(l=60,r=60,b=60,t=60,pad=4),
 #        width=300,
         height=200,
         grid = {'rows': 1, 'columns': 3, 'pattern': "independent"},
@@ -281,10 +282,20 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
         start_date,
         end_date
     )
-    return {
-        'data': [{'x': df.index,'y': df.Close}],
-        'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
-    }
+
+    fig = go.Figure()
+    fig.add_trace(
+    go.Scatter(x=list(df.index), y=list(df['Close'])))
+   
+    # update_layout
+    fig.update_layout(
+        height=500,
+        template='plotly_white',
+    ) 
+
+    
+
+    return fig
 
 
 # Line Chart (Benchmark)
