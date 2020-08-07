@@ -19,9 +19,6 @@ import plotly.io as pio #themes
 
 #pio.templates
 
-
-
-
 #### Investing.com: Stock Price
 #def get_stock_price (stock, from_date, to_date, country= 'united states'):
 #
@@ -91,15 +88,19 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'A':'BC'
 }
 
+#import csv
+df_stockls = pd.read_csv('stocklist.csv')
+
 # df for table
-l_of_stocks = ['VTI', 'VEA', 'VWO', 'BND', 'VOO', 'VT',
-               'NVDA', 'AMD', 'INTC', '0050.TW',
-               'ESPO', 'SKYY' ]
+l_of_stocks = df_stockls['value'].tolist()
 df_stock = get_stockP(l_of_stocks)
 #df_stock_return = get_stockP_return(df_stock)
 
 df_stock = df_stock.sort_values(by='Date', ascending=False)
 #df_stock_return = df_stock_return.sort_values(by='Date', ascending=False)
+
+
+
 
 app = dash.Dash('Hello World')
 server = app.server
@@ -119,20 +120,7 @@ app.layout = html.Div(
                     html.Div(
                         dcc.Dropdown(
                         id='my-dropdown',
-                        options=[
-                            {'label': 'VTI', 'value': 'VTI'},
-                            {'label': 'VEA', 'value': 'VEA'},
-                            {'label': 'VWO', 'value': 'VWO'},
-                            {'label': 'VOO', 'value': 'VOO'},
-                            {'label': 'VT', 'value': 'VT'},
-                            {'label': 'BND', 'value': 'BND'},
-                            {'label': 'NVDA', 'value': 'NVDA'},
-                            {'label': 'AMD', 'value': 'AMD'},
-                            {'label': 'INTC', 'value': 'INTC'},
-                            {'label': '0050', 'value': '0050.TW'},
-                            {'label': 'ESPO', 'value': 'ESPO'},
-                            {'label': 'SKYY', 'value': 'SKYY'}
-                        ],
+                        options= df_stockls[['value', 'label']].to_dict('records'),
                         value='VTI'
                                 ) #, style={'display':'inline-block', 'width': '50%'}
                             ),
@@ -163,12 +151,7 @@ app.layout = html.Div(
                         html.Label(["Benchmark",
                             dcc.Dropdown(
                             id='dropdown_benchmark1',
-                            options=[
-                                {'label': 'VTI (US Total Stock)', 'value': 'VTI'},
-                                {'label': 'VOO (S&P 500)', 'value': 'VOO'},
-                                {'label': 'VT (Total World Stock)', 'value': 'VT'},
-                                {'label': 'BND (US Total Bond)', 'value': 'BND'},
-                            ],
+                            options= df_stockls[df_stockls['benchmark'] == 'Y'][['value', 'label']].to_dict('records'),
                             value='VOO'
                                     )])
                             ,style={'display':'inline-block', 'width': '50%'}
@@ -177,16 +160,7 @@ app.layout = html.Div(
                         html.Label(["Stock/ETF",
                             dcc.Dropdown(
                             id='dropdown_benchmark2',
-                            options=[
-                                {'label': '0050', 'value': '0050.TW'},
-                                {'label': 'VEA', 'value': 'VEA'},
-                                {'label': 'VWO', 'value': 'VWO'},
-                                {'label': 'NVDA', 'value': 'NVDA'},
-                                {'label': 'AMD', 'value': 'AMD'},
-                                {'label': 'INTC', 'value': 'INTC'},
-                                {'label': 'ESPO', 'value': 'ESPO'},
-                                {'label': 'SKYY', 'value': 'SKYY'}
-                            ],
+                            options= df_stockls[df_stockls['benchmark'] == 'N'][['value', 'label']].to_dict('records'),
                             value='0050.TW'
                                     )])
                             ,style={'display':'inline-block', 'width': '50%'}
