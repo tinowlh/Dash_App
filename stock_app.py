@@ -166,7 +166,8 @@ app.layout = html.Div(
                                     )])
                             ,style={'display':'inline-block', 'width': '50%'}
                             )
-                        ] , style={'background-color':'grey', 'color':'white'}
+                        ] , style={'background-color':'#C0C0C0',
+                                   'font-family':'georgia'}
                  ),        
         dcc.Graph(id='graph-benchmark'),
     #    dcc.Graph(id='pie-chart'),
