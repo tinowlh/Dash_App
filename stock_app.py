@@ -166,7 +166,7 @@ app.layout = html.Div(
                                     )])
                             ,style={'display':'inline-block', 'width': '50%'}
                             )
-                        ]
+                        ] , style={'background-color':'grey', 'color':'white'}
                  ),        
         dcc.Graph(id='graph-benchmark'),
     #    dcc.Graph(id='pie-chart'),
@@ -177,7 +177,9 @@ app.layout = html.Div(
         columns=[{"name": i, "id": i} for i in df_stock.columns],
         data=df_stock.to_dict('records'),
         page_size = 20,
-        sort_action="native"
+ #       style_as_list_view=True,
+        sort_action="native",
+        style_header={'backgroundColor': 'rgb(224, 224, 224)'}
         ),
         html.Br(),
     #    dcc.Markdown('**Percentage Change**'),
@@ -312,7 +314,7 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Cumulative Return"
                  )
-    fig.update_layout(height=500, template='plotly')           
+    fig.update_layout(height=500, template='plotly_dark')           
     return fig
 
 
