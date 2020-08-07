@@ -180,7 +180,8 @@ app.layout = html.Div(
         page_size = 20,
  #       style_as_list_view=True,
         sort_action="native",
-        style_header={'backgroundColor': 'rgb(224, 224, 224)'}
+        style_header={'backgroundColor': 'rgb(224, 224, 224)',
+                      'fontWeight': 'bold'}
         ),
         html.Br(),
     #    dcc.Markdown('**Percentage Change**'),
