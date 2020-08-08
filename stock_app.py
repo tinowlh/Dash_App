@@ -90,7 +90,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
 
 #import csv
 df_stockls = pd.read_csv('stocklist.csv')
-
+df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
 # df for table
 l_of_stocks = df_stockls['value'].tolist()
 df_stock = get_stockP(l_of_stocks)
@@ -246,9 +246,9 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
     fig.update_layout(
         paper_bgcolor="#EBF5FB",
         autosize=True,
-        margin=dict(l=60,r=60,b=60,t=60,pad=4),
+        margin=dict(l=40,r=40,b=40,t=50,pad=4),
 #        width=300,
-        height=200,
+        height=130,
         grid = {'rows': 1, 'columns': 3, 'pattern': "independent"},
         template = {'data' : {'indicator': [{
                                             'title': {'text': "Return"},
@@ -316,7 +316,7 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Cumulative Return"
                  )
-    fig.update_layout(height=500, template='plotly_dark')           
+    fig.update_layout(height=650, template='plotly_dark')           
     return fig
 
 
