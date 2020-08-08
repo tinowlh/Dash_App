@@ -105,10 +105,10 @@ df_stock = df_stock.sort_values(by='Date', ascending=False)
 app = dash.Dash('Hello World')
 server = app.server
 
-auth = dash_auth.BasicAuth(
-    app,
-    VALID_USERNAME_PASSWORD_PAIRS
-)
+#auth = dash_auth.BasicAuth(
+#    app,
+#    VALID_USERNAME_PASSWORD_PAIRS
+#)
 
 
 app.layout = html.Div(
