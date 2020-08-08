@@ -121,7 +121,7 @@ app.layout = html.Div(
                         dcc.Dropdown(
                         id='my-dropdown',
                         options= df_stockls[['value', 'label']].to_dict('records'),
-                        value='VTI'
+                        value='VOO'
                                 ) #, style={'display':'inline-block', 'width': '50%'}
                             ),
                     html.Div(
