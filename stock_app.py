@@ -235,7 +235,7 @@ content_fourth_row = dbc.Row(
 content = html.Div(
     [
         dcc.Markdown('Update every 30 seconds',style={'textAlign': 'right'}),
-        html.H2('Stock/ETF Analysis Dashboard', style=TEXT_STYLE),
+        html.H2('Stock Analysis Dashboard', style=TEXT_STYLE),
         html.Hr(),
         content_first_row,
         html.Br(),
@@ -416,7 +416,7 @@ def update_datatable(start_date, end_date, n):
 
 
 
-app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
+#app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 if __name__ == '__main__':
     app.run_server(debug=True)
