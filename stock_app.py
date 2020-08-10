@@ -255,8 +255,8 @@ content = html.Div(
 
 ### Initialize app ###
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 app.layout = html.Div([sidebar, content])
-
 
 #auth = dash_auth.BasicAuth(
 #    app,
