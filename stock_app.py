@@ -104,16 +104,6 @@ df_stock = df_stock.sort_values(by='Date', ascending=False)
 
 
 
-app = dash.Dash('Hello World')
-server = app.server
-
-#auth = dash_auth.BasicAuth(
-#    app,
-#    VALID_USERNAME_PASSWORD_PAIRS
-#)
-
-
-
 ### SIDEBAR ###
 # the style arguments for the sidebar.
 SIDEBAR_STYLE = {
@@ -266,6 +256,12 @@ content = html.Div(
 ### Initialize app ###
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = html.Div([sidebar, content])
+
+
+#auth = dash_auth.BasicAuth(
+#    app,
+#    VALID_USERNAME_PASSWORD_PAIRS
+#)
 
 
 
