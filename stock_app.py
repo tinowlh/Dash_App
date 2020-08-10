@@ -1,6 +1,7 @@
 import dash
 import dash_table
 from dash.dependencies import Input, Output, State
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_auth
@@ -88,6 +89,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'A':'BC'
 }
 
+### Data preprocess ###
 #import csv
 df_stockls = pd.read_csv('stocklist.csv')
 df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
@@ -111,19 +113,172 @@ server = app.server
 #)
 
 
-app.layout = html.Div(
+
+### SIDEBAR ###
+# the style arguments for the sidebar.
+SIDEBAR_STYLE = {
+    'position': 'fixed',
+    'top': 0,
+    'left': 0,
+    'bottom': 0,
+    'width': '20%',
+    'padding': '20px 10px',
+    'background-color': '#f8f9fa'
+}
+
+
+TEXT_STYLE = {
+    'textAlign': 'center',
+    'color': '#191970'
+}
+
+
+
+# sidebar controls
+controls = dbc.FormGroup(
+    [
+        dcc.Markdown('Stock Ticker'),
+        dcc.Dropdown(
+            id='my-dropdown',
+            options= df_stockls[['value', 'label']].to_dict('records'),
+            value='VOO'
+                ), 
+        html.Br(),
+        dcc.Markdown('Date'),
+        dcc.DatePickerRange(
+            id='my-date-picker-range',
+            display_format='YYYY-MM-DD',
+            start_date = dt(2019, 1, 1),
+            min_date_allowed=dt(2018, 1, 1),
+            max_date_allowed=dt.now(),
+            initial_visible_month=dt(2019, 1, 1),
+            end_date=dt.now().date()
+                        ),
+        html.Br(),
+        html.Br(),
+        dcc.Markdown('Cumulative Return Benchmark'),
+        dcc.Dropdown(
+            id='dropdown_benchmark1',
+            options= df_stockls[df_stockls['benchmark'] == 'Y'][['value', 'label']].to_dict('records'),
+            value='VOO'
+                ),
+        html.Br(),
+        dcc.Markdown('Cumulative Return Stock/ETF'),        
+        dcc.Dropdown(
+            id='dropdown_benchmark2',
+            options= df_stockls[df_stockls['benchmark'] == 'N'][['value', 'label']].to_dict('records'),
+            value='0050.TW'
+                )
+        
+    ]
+)
+
+
+
+sidebar = html.Div(
+    [
+        #html.H2('Parameters', style=TEXT_STYLE),
+        #html.Hr(),
+        controls
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+
+
+### CONTENT ###
+
+# the style arguments for the main content page.
+CONTENT_STYLE = {
+    'margin-left': '25%',
+    'margin-right': '5%',
+    'padding': '20px 10p'
+}
+
+
+CARD_TEXT_STYLE = {
+    'textAlign': 'center',
+    'color': '#0074D9'
+}
+
+
+content_first_row = dbc.Row(
+    [
+        dbc.Col(dcc.Graph(id='my-indicator'), md=12)
+    ]
+)
+
+content_second_row = dbc.Row(
+    [
+        dbc.Col(dcc.Graph(id='my-graph'), md=12)
+    ]
+)
+
+content_third_row = dbc.Row(
+    [
+        dbc.Col(dcc.Graph(id='graph-benchmark'), md=12)
+    ]
+)
+
+
+content_fourth_row = dbc.Row(
+    [
+        dbc.Col(
+            dash_table.DataTable(
+            id='table',
+            columns=[{"name": i, "id": i} for i in df_stock.columns],
+            data=df_stock.to_dict('records'),
+            page_size = 20,
+    #       style_as_list_view=True,
+            sort_action="native",
+            style_header={'backgroundColor': 'rgb(224, 224, 224)',
+                        'fontWeight': 'bold'}
+            ),
+         md=12
+        ) 
+    ]
+)
+
+
+
+content = html.Div(
+    [
+        dcc.Markdown('Update every 30 seconds',style={'textAlign': 'right'}),
+        html.H2('Stock/ETF Analysis Dashboard', style=TEXT_STYLE),
+        html.Hr(),
+        content_first_row,
+        html.Br(),
+        content_second_row,
+        html.Br(),
+        content_third_row,
+        html.Br(),
+        content_fourth_row,
+        dcc.Interval(
+                id='interval-component',
+                interval=30*1000, # in milliseconds 30sec update
+                n_intervals=0
+                    )
+    ],
+    style=CONTENT_STYLE
+)
+
+
+
+""" app.layout = html.Div(
     children=[
         dcc.Markdown('Update every 30 seconds',style={'textAlign': 'right'}),
-        dcc.Markdown('**Stock Ticker**'),
+        #Sidebar
         html.Div(
                 children=[
+                    dcc.Markdown('**Stock Ticker**',style={'textAlign': 'center'}),
                     html.Div(
                         dcc.Dropdown(
                         id='my-dropdown',
                         options= df_stockls[['value', 'label']].to_dict('records'),
                         value='VOO'
-                                ) #, style={'display':'inline-block', 'width': '50%'}
+                                ) 
                             ),
+                    dcc.Markdown('**Date**'),        
                     html.Div(
                         dcc.DatePickerRange(
                             id='my-date-picker-range',
@@ -135,19 +290,7 @@ app.layout = html.Div(
                             end_date=dt.now().date()
                                         )
                                     #, style={'display':'inline-block', 'width': '50%'}
-                              )
-                         ]
-                  ),
-        dcc.Graph(id='my-indicator'),
-    #    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
-    #              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
-    #              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
-    #              html.Div(id='my-output')]),   
-    #    html.Label('Stock Ticker'),
-        dcc.Graph(id='my-graph'),
-        html.Br(),
-        html.Div(
-                children=[
+                              ),            
                     html.Div(
                         html.Label(["Benchmark",
                             dcc.Dropdown(
@@ -155,20 +298,28 @@ app.layout = html.Div(
                             options= df_stockls[df_stockls['benchmark'] == 'Y'][['value', 'label']].to_dict('records'),
                             value='VOO'
                                     )])
-                            ,style={'display':'inline-block', 'width': '50%'}
-                            ),
-                     html.Div(
+                            ,#style={'display':'inline-block', 'width': '50%'}
+                            ),      
+                    html.Div(
                         html.Label(["Stock/ETF",
                             dcc.Dropdown(
                             id='dropdown_benchmark2',
                             options= df_stockls[df_stockls['benchmark'] == 'N'][['value', 'label']].to_dict('records'),
                             value='0050.TW'
                                     )])
-                            ,style={'display':'inline-block', 'width': '50%'}
+                            ,#style={'display':'inline-block', 'width': '50%'}
                             )
-                        ] , style={'background-color':'#C0C0C0',
-                                   'font-family':'georgia'}
-                 ),        
+                        ],
+                    style = SIDEBAR_STYLE
+                        ),
+        dcc.Graph(id='my-indicator'),
+    #    html.Div(["Input1: ",dcc.Input(id='my-input1', value=1, type='number'),
+    #              "Input2: ",dcc.Input(id='my-input2', value=1, type='number'),
+    #              html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
+    #              html.Div(id='my-output')]),   
+    #    html.Label('Stock Ticker'),
+        dcc.Graph(id='my-graph'),
+        html.Br(),       
         dcc.Graph(id='graph-benchmark'),
     #    dcc.Graph(id='pie-chart'),
         html.Br(),
@@ -197,7 +348,16 @@ app.layout = html.Div(
                 interval=30*1000, # in milliseconds 30sec update
                 n_intervals=0
                     )
-            ], style={'width': 'auto'})
+            ], style={'width': 'auto'}) """
+
+
+
+
+
+### Initialize app ###
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.layout = html.Div([sidebar, content])
+
 
 
 ### Callback ###
@@ -293,6 +453,7 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
    
     # update_layout
     fig.update_layout(
+        title='Stock Price',
         height=500,
         template='plotly_white',
     ) 
