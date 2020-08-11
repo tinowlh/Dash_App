@@ -133,7 +133,8 @@ controls = dbc.FormGroup(
         dcc.Dropdown(
             id='my-dropdown',
             options= df_stockls[['value', 'label']].to_dict('records'),
-            value='VOO'
+            value='VOO',
+            style= {'color':'#000000'}
                 ), 
         html.Br(),
         dcc.Markdown('Date'),
@@ -152,14 +153,16 @@ controls = dbc.FormGroup(
         dcc.Dropdown(
             id='dropdown_benchmark1',
             options= df_stockls[df_stockls['benchmark'] == 'Y'][['value', 'label']].to_dict('records'),
-            value='VOO'
+            value='VOO',
+            style= {'color':'#000000'}
                 ),
         html.Br(),
         dcc.Markdown('Cumulative Return Stock/ETF'),        
         dcc.Dropdown(
             id='dropdown_benchmark2',
             options= df_stockls[df_stockls['benchmark'] == 'N'][['value', 'label']].to_dict('records'),
-            value='0050.TW'
+            value='0050.TW',
+            style= {'color':'#000000'}
                 )
         
     ]
