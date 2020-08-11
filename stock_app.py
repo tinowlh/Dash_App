@@ -113,14 +113,15 @@ SIDEBAR_STYLE = {
     'bottom': 0,
     'width': '20%',
     'padding': '20px 10px',
-    'background-color': '#c6c7c8'
+    'color': '#ffffff',
+    'background-color': '#3498DB'
 }
 
 
 TEXT_STYLE = {
     'textAlign': 'center',
     'color': '#191970',
-    'background-color': '#c6c7c8'
+    'background-color': '#ecf0f1'
 }
 
 
@@ -255,7 +256,7 @@ content = html.Div(
 
 
 ### Initialize app ###
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
 server = app.server
 app.layout = html.Div([sidebar, content])
 
