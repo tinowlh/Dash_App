@@ -129,7 +129,7 @@ TEXT_STYLE = {
 # sidebar controls
 controls = dbc.FormGroup(
     [
-        dcc.Markdown('Stock Ticker'),
+        dcc.Markdown('Stock Symbol'),
         dcc.Dropdown(
             id='my-dropdown',
             options= df_stockls[['value', 'label']].to_dict('records'),
