@@ -260,7 +260,7 @@ content = html.Div(
 
 ### Initialize app ###
 app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
-app.title = 'Stock Analysis'
+app.title = 'Stock Analysis' #web tab title
 server = app.server
 app.layout = html.Div([sidebar, content])
 
@@ -365,7 +365,7 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
     # update_layout
     fig.update_layout(
         title='Stock Price',
-        height=500,
+        height=600,
         template='plotly_white',
     ) 
 
@@ -388,7 +388,7 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Cumulative Return"
                  )
-    fig.update_layout(height=650, template='plotly_dark')           
+    fig.update_layout(height=600, template='plotly_dark')           
     return fig
 
 
