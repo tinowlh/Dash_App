@@ -260,6 +260,7 @@ content = html.Div(
 
 ### Initialize app ###
 app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
+app.title = 'Stock Analysis'
 server = app.server
 app.layout = html.Div([sidebar, content])
 
