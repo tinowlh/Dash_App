@@ -210,7 +210,7 @@ controls = dbc.FormGroup(
         html.Br(),
         html.Br(),
         html.Br(),
-        dcc.Markdown('Cluster Count'),
+        dcc.Markdown('K-means Cluster Count'),
         dbc.Input(id="cluster-count", type="number", value=2)
         
     ]
