@@ -169,7 +169,7 @@ TEXT_STYLE = {
 controls = dbc.FormGroup(
     [
      
-        dcc.Markdown('Stock Symbol'),
+        dcc.Markdown('Stock/ETF'),
         dcc.Dropdown(
             id='my-dropdown',
             options= df_stockls[['value', 'label']].to_dict('records'),
@@ -189,6 +189,8 @@ controls = dbc.FormGroup(
                         ),
         html.Br(),
         html.Br(),
+        html.Br(),
+        html.Br(),
         dcc.Markdown('Cumulative Return Benchmark'),
         dcc.Dropdown(
             id='dropdown_benchmark1',
@@ -204,6 +206,9 @@ controls = dbc.FormGroup(
             value='0050.TW',
             style= {'color':'#000000'}
                 ),
+        html.Br(),
+        html.Br(),
+        html.Br(),
         html.Br(),
         dcc.Markdown('Cluster Count'),
         dbc.Input(id="cluster-count", type="number", value=2)
@@ -445,21 +450,6 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
     return fig
 
 
-""" @app.callback(Output('pie-chart', 'figure'),
-            [Input('my-dropdown','value')])
-def update_pie_chart(my_dropdown):
-    dff = pd.DataFrame({'Stock': ['A', 'B'], 'Value': [6, 4]})
-
-    piechart=px.pie(
-            data_frame=dff,
-            names='Stock',
-            values='Value',
-            hole=.3,
-            )
-
-    return piechart """
-
-
 # clustering
 @app.callback(Output('graph-cluster', 'figure'),
             [Input('my-dropdown', 'value'),
@@ -485,8 +475,8 @@ def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters)
             x=df_cluster.loc[df_cluster.cluster == c, 'AnnReturn'],
             y=df_cluster.loc[df_cluster.cluster == c, 'Volatility'],
             mode="markers",
-            marker={"size": 10},
-            name="Cluster {}".format(c),
+            marker={"size": 12},
+            name="Cluster{}".format(c),
             text=df_cluster.loc[df_cluster.cluster == c, 'Symbols']
             
         )
@@ -505,7 +495,7 @@ def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters)
         )
     )
     
-    layout = {"xaxis": {"title": 'Annualized Return'}, "yaxis": {"title": 'Volatility'}}
+    layout = {"xaxis": {"title": 'Annualized Return'}, "yaxis": {"title": 'Volatility (Risk)'}}
 
     fig = go.Figure(data=data, layout=layout)
 
