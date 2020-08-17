@@ -113,6 +113,7 @@ def get_df_cluster(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df_cluster = pd.merge(df_annualized_return, 
                           df_volatility, 
                           left_index=True, right_index = True)
+    df_cluster = round(df_cluster, 4)                      
     df_cluster = df_cluster.reset_index()
     
     return df_cluster
@@ -281,6 +282,7 @@ content_fifth_row = dbc.Row(
             data=df_stock.to_dict('records'),
             page_size = 20,
     #       style_as_list_view=True,
+    #       fixed_rows={'headers': True},
             sort_action="native",
             style_header={'backgroundColor': 'rgb(224, 224, 224)',
                         'fontWeight': 'bold'}
