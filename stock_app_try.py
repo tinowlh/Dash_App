@@ -7,9 +7,10 @@ import dash_html_components as html
 import dash_auth
 
 import pandas as pd
-from pandas_datareader import data as web
+import yfinance as yf
 from datetime import datetime as dt
 import numpy as np
+
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -17,7 +18,68 @@ import plotly.io as pio #themes
 
 from sklearn.cluster import KMeans
 
+
 # testttt
+
+#df_cluster = get_df_cluster(tickers_cluster)
+#df = df_cluster.loc[:, ['AnnReturn', 'Volatility']]
+#
+#km = KMeans(n_clusters=max(3, 2))
+#km.fit(df.values)
+#df_cluster["cluster"] = km.labels_
+#centers = km.cluster_centers_
+#
+#    #data points
+#    data = [
+#        go.Scatter(
+#            x=df_cluster.loc[df_cluster.cluster == c, 'AnnReturn'],
+#            y=df_cluster.loc[df_cluster.cluster == c, 'Volatility'],
+#            mode="markers",
+#            marker={"size": 12},
+#            name="Cluster{}".format(c),
+#            text=df_cluster.loc[df_cluster.cluster == c, 'Symbols']
+#            
+#        )
+#        for c in range(3)
+#    ]
+#    
+#    
+#    # centers
+#    data.append(
+#        go.Scatter(
+#            x=centers[:, 0],
+#            y=centers[:, 1],
+#            mode="markers",
+#            marker={"color": "#000", "size": 8, "symbol": "diamond"},
+#            name="Cluster centers",
+#        )
+#    )
+#    
+#    layout = {"xaxis": {"title": 'Annualized Return'}, "yaxis": {"title": 'Volatility (Risk)'}}
+#
+#    fig = go.Figure(data=data, layout=layout)
+#
+#    fig.update_layout(height=600,
+#        title = 'K-means Clustering',
+#        template='seaborn')   
+
+##import csv
+#df_stockls = pd.read_csv('stocklist.csv')
+#df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
+## df for table
+#l_of_stocks = df_stockls['value'].tolist()
+#
+#
+#
+#tickers = " ".join(l_of_stocks) 
+#
+#    
+#df = yf.download(tickers, start = dt(2020, 1, 1), end = dt.now())
+#df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
+#df.columns =df.columns.droplevel()
+
+
+
 
 
 #import datetime
@@ -55,16 +117,16 @@ from sklearn.cluster import KMeans
 #                                    to_date= today)
 
 
-def get_stockP_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
+def get_stockP_raw(tickers, start = dt(2020, 1, 1), end = dt.now()):
     # data preparation
-    df = web.DataReader(l_of_stocks, 'yahoo', start, end)
+    df = yf.download(tickers, start, end)
     df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
     df.columns =df.columns.droplevel()
     return df
 
 
-def get_stockP(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df_stock = get_stockP_raw(l_of_stocks, start, end)
+def get_stockP(tickers, start = dt(2020, 1, 1), end = dt.now()):
+    df_stock = get_stockP_raw(tickers, start, end)
     df_stock = df_stock.reset_index('Date').round(2)
     df_stock['Date'] = df_stock['Date'].dt.date
     return df_stock
@@ -77,8 +139,8 @@ def get_stockP_return(df_stock):
     return df_stock_return
 
 
-def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockP_raw(l_of_stocks, start, end)
+def get_cum_return(tickers, start = dt(2020, 1, 1), end = dt.now()):
+    df = get_stockP_raw(tickers, start, end)
     df_daily_return = df.pct_change()
     df_daily_cum_return = (1 + df_daily_return).cumprod()
     df_daily_cum_return = df_daily_cum_return.reset_index('Date')
@@ -89,24 +151,24 @@ def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     return df_unpivot
 
 
-def get_annualizedReturn(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockP_raw(l_of_stocks, start, end)
+def get_annualizedReturn(tickers_cluster, start = dt(2020, 1, 1), end = dt.now()):
+    df = get_stockP_raw(tickers_cluster, start, end)
     ttl_return = (df.iloc[-1] - df.iloc[0]) / df.iloc[0]
     df_ttl_return = ttl_return.to_frame(name="TTLReturn")
     df_annualized_return = ((1 + df_ttl_return) ** (365 / len(df))) -1 
     df_annualized_return = df_annualized_return.rename(columns={"TTLReturn": "AnnReturn"})
     return df_annualized_return
    
-def get_volatility(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockP_raw(l_of_stocks, start, end)
+def get_volatility(tickers_cluster, start = dt(2020, 1, 1), end = dt.now()):
+    df = get_stockP_raw(tickers_cluster, start, end)
     df_return = df.pct_change()
     sr_volatility = df_return.std() * np.sqrt(250)
     df_volatility = sr_volatility.to_frame(name="Volatility")
     return df_volatility
 
-def get_df_cluster(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df_annualized_return = get_annualizedReturn(l_of_stocks, start, end)
-    df_volatility = get_volatility(l_of_stocks, start, end)
+def get_df_cluster(tickers_cluster, start = dt(2020, 1, 1), end = dt.now()):
+    df_annualized_return = get_annualizedReturn(tickers_cluster, start, end)
+    df_volatility = get_volatility(tickers_cluster, start, end)
     
     # merge
     df_cluster = pd.merge(df_annualized_return, 
@@ -132,9 +194,11 @@ df_stockls = pd.read_csv('stocklist.csv')
 df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
 # df for table
 l_of_stocks = df_stockls['value'].tolist()
+tickers = " ".join(l_of_stocks) 
 l_cluster = df_stockls['value'].tolist()
 l_cluster.remove('0050.TW')
-df_stock = get_stockP(l_of_stocks)
+tickers_cluster = " ".join(l_cluster) 
+df_stock = get_stockP(tickers)
 #df_stock_return = get_stockP_return(df_stock)
 
 df_stock = df_stock.sort_values(by='Date', ascending=False)
@@ -339,9 +403,8 @@ app.layout = html.Div([sidebar, content])
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_indicator(selected_dropdown_value, start_date, end_date, n):
-    df = web.DataReader(
+    df = yf.download(
         selected_dropdown_value,
-        'yahoo',
         start_date,
         end_date
         )
@@ -410,11 +473,10 @@ def update_output_div(n_clicks, input_value1, input_value2):
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_graph(selected_dropdown_value, start_date, end_date, n):
-    df = web.DataReader(
+    df = yf.download(
         selected_dropdown_value,
-        'yahoo',
-        start_date,
-        end_date
+        start = start_date,
+        end = end_date
     )
 
     fig = go.Figure()
@@ -441,7 +503,9 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
             Input('interval-component', 'n_intervals')])
 def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, end_date, n):
     ls = [dropdown_bmak1_value, dropdown_bmak2_value]
-    df = get_cum_return(ls, start_date, end_date)
+    print ls
+    tk = ' '.join(ls)
+    df = get_cum_return(tk, start_date, end_date)
     df['Stock/ETF'] = df['Stock/ETF'].str.replace('VOO', 'VOO (S&P 500)')
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Cumulative Return"
@@ -459,7 +523,7 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
             Input("cluster-count", "value")])
 def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters):
     # data preparation
-    df_cluster = get_df_cluster(l_cluster)
+    df_cluster = get_df_cluster(tickers_cluster)
     df = df_cluster.loc[:, ['AnnReturn', 'Volatility']]
     
     #K-means Clustering
@@ -478,7 +542,7 @@ def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters)
             mode="markers",
             marker={"size": 12},
             name="Cluster{}".format(c),
-            text=df_cluster.loc[df_cluster.cluster == c, 'Symbols']
+            text=df_cluster.loc[df_cluster.cluster == c, 'index']
             
         )
         for c in range(n_clusters)
@@ -518,7 +582,7 @@ def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters)
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_datatable(start_date, end_date, n):
-    df_stock = get_stockP(l_of_stocks, start_date, end_date)
+    df_stock = get_stockP(tickers, start_date, end_date)
     df_stock = df_stock.sort_values(by='Date', ascending=False)
     data=df_stock.to_dict('records')
     

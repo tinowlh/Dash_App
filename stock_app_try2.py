@@ -7,7 +7,8 @@ import dash_html_components as html
 import dash_auth
 
 import pandas as pd
-from pandas_datareader import data as web
+from pandas_datareader import data as pdr
+import yfinance as yf
 from datetime import datetime as dt
 import numpy as np
 
@@ -16,6 +17,9 @@ import plotly.graph_objects as go
 import plotly.io as pio #themes
 
 from sklearn.cluster import KMeans
+
+yf.pdr_override()
+
 
 # testttt
 
@@ -57,7 +61,7 @@ from sklearn.cluster import KMeans
 
 def get_stockP_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     # data preparation
-    df = web.DataReader(l_of_stocks, 'yahoo', start, end)
+    df = pdr.get_data_yahoo(l_of_stocks, start, end)
     df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
     df.columns =df.columns.droplevel()
     return df
@@ -339,9 +343,8 @@ app.layout = html.Div([sidebar, content])
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_indicator(selected_dropdown_value, start_date, end_date, n):
-    df = web.DataReader(
+    df = pdr.get_data_yahoo(
         selected_dropdown_value,
-        'yahoo',
         start_date,
         end_date
         )
@@ -410,9 +413,8 @@ def update_output_div(n_clicks, input_value1, input_value2):
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_graph(selected_dropdown_value, start_date, end_date, n):
-    df = web.DataReader(
+    df = pdr.get_data_yahoo(
         selected_dropdown_value,
-        'yahoo',
         start_date,
         end_date
     )
