@@ -25,49 +25,41 @@ from sklearn.cluster import KMeans
 
 #pio.templates
 
-#### Investing.com: Stock Price
-#def get_stock_price (stock, from_date, to_date, country= 'united states'):
-#
-#    df = investpy.get_stock_historical_data(stock= stock,
-#                                        country= country,
-#                                        from_date= from_date,
-#                                        to_date= to_date)
-#    df = df[['Close']]
-#    df = df.rename(columns = {'Close':'{stock}'.format(stock=stock)})
-#    df = df.reset_index('Date')
-#    df['Date'] = df['Date'].dt.date
-##    df.index = pd.to_datetime(df.index)
-#
-##    df.index = df.index.strftime("%G") + df.index.strftime("%V")
-##    df = df.groupby(df.index).mean()
-#
-#    return df
-#
-#
-#today = datetime.date.today()
-#fr_date = '01/01/2018'
-#today = today.strftime("%d/%m/%Y") # dd/mm/YY
-#
-#
-#
-#df = get_stock_price(stock= '2376', country= 'taiwan',
-#                                    from_date= fr_date,
-#                                    to_date= today)
+
+
+def get_stockV_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
+    # data preparation
+    df = web.DataReader(l_of_stocks, 'yahoo', start, end)
+    df = df.loc[:, df.columns.get_level_values(0).isin({'Volume'})]
+    df.columns =df.columns.droplevel()
+    return df
+
+def get_stockV(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
+    df = get_stockV_raw(l_of_stocks, start, end)
+    df = df.reset_index('Date')
+    df['Date'] = df['Date'].dt.date
+    return df
 
 
 def get_stockP_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     # data preparation
     df = web.DataReader(l_of_stocks, 'yahoo', start, end)
-    df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})]
+    df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})].round(2)
     df.columns =df.columns.droplevel()
     return df
 
 
 def get_stockP(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df_stock = get_stockP_raw(l_of_stocks, start, end)
-    df_stock = df_stock.reset_index('Date').round(2)
-    df_stock['Date'] = df_stock['Date'].dt.date
-    return df_stock
+    df = get_stockP_raw(l_of_stocks, start, end)
+    df = df.reset_index('Date').round(2)
+    df['Date'] = df['Date'].dt.date
+    return df
+
+
+def add_date_col(df):
+    df = df.reset_index('Date')
+    df['Date'] = df['Date'].dt.date
+    return df
 
 
 def get_stockP_return(df_stock):
@@ -134,7 +126,8 @@ df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
 l_of_stocks = df_stockls['value'].tolist()
 l_cluster = df_stockls['value'].tolist()
 l_cluster.remove('0050.TW')
-df_stock = get_stockP(l_of_stocks)
+df_stock = get_stockP_raw(l_of_stocks)
+df_stock = add_date_col(df_stock)
 #df_stock_return = get_stockP_return(df_stock)
 
 df_stock = df_stock.sort_values(by='Date', ascending=False)
@@ -518,7 +511,8 @@ def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters)
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_datatable(start_date, end_date, n):
-    df_stock = get_stockP(l_of_stocks, start_date, end_date)
+    df_stock = get_stockP_raw(l_of_stocks, start_date, end_date)
+    df_stock = add_date_col(df_stock)
     df_stock = df_stock.sort_values(by='Date', ascending=False)
     data=df_stock.to_dict('records')
     
