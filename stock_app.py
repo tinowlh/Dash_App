@@ -13,9 +13,11 @@ import numpy as np
 
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import plotly.io as pio #themes
 
 from sklearn.cluster import KMeans
+
 
 # testttt
 
@@ -34,12 +36,6 @@ def get_stockV_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df.columns =df.columns.droplevel()
     return df
 
-def get_stockV(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockV_raw(l_of_stocks, start, end)
-    df = df.reset_index('Date')
-    df['Date'] = df['Date'].dt.date
-    return df
-
 
 def get_stockP_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     # data preparation
@@ -47,14 +43,6 @@ def get_stockP_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})].round(2)
     df.columns =df.columns.droplevel()
     return df
-
-
-def get_stockP(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockP_raw(l_of_stocks, start, end)
-    df = df.reset_index('Date').round(2)
-    df['Date'] = df['Date'].dt.date
-    return df
-
 
 def add_date_col(df):
     df = df.reset_index('Date')
@@ -74,6 +62,7 @@ def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df_daily_return = df.pct_change()
     df_daily_cum_return = (1 + df_daily_return).cumprod()
     df_daily_cum_return = df_daily_cum_return.reset_index('Date')
+    df_daily_cum_return = df_daily_cum_return.round(4)
     #df_daily_cum_return['Date'] = df_daily_cum_return['Date'].dt.date
     df_unpivot = df_daily_cum_return.melt(id_vars='Date',
                          var_name= 'Stock/ETF', 
@@ -204,7 +193,7 @@ controls = dbc.FormGroup(
         html.Br(),
         html.Br(),
         dcc.Markdown('K-means Cluster Count'),
-        dbc.Input(id="cluster-count", type="number", value=2)
+        dbc.Input(id="cluster-count", type="number", value=3)
         
     ]
 )
@@ -246,7 +235,7 @@ content_first_row = dbc.Row(
 
 content_second_row = dbc.Row(
     [
-        dbc.Col(dcc.Graph(id='my-graph'), md=12)
+        dbc.Col(dcc.Graph(id='my-line-bar-chart'), md=12)
     ]
 )
 
@@ -396,8 +385,8 @@ def update_output_div(n_clicks, input_value1, input_value2):
     v = (input_value1 - input_value2) * 100
     return 'Output: {} (The Button has been pressed {} times)'.format(v, n_clicks) """
 
-# Line Chart
-@app.callback(Output('my-graph', 'figure'), 
+# Line Bar Chart
+@app.callback(Output('my-line-bar-chart', 'figure'), 
             [Input('my-dropdown', 'value'),
             Input('my-date-picker-range', 'start_date'),
             Input('my-date-picker-range', 'end_date'),
@@ -410,17 +399,35 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
         end_date
     )
 
-    fig = go.Figure()
+    # Create figure with secondary y-axis
+    #fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig = make_subplots(
+                    rows=2, cols=1, 
+                    shared_xaxes=True, 
+                    vertical_spacing=0.05
+                    )
+
     fig.add_trace(
-    go.Scatter(x=list(df.index), y=list(df['Close'])))
+    go.Scatter(x=list(df.index), y=list(df['Close']), name="Price"),
+    row=1, col=1
+    )
+
+
+    fig.add_trace(
+    go.Bar(x=list(df.index), y=list(df['Volume']), name="Volume"),
+    row=2, col=1
+    )
    
     # update_layout
     fig.update_layout(
-        title='Stock Price',
+        title='Stock Price & Volume',
         height=600,
-        template='plotly_white',
+        template='plotly_dark',
     ) 
 
+    ## Set y-axes titles
+    #fig.update_yaxes(title_text="<b>Price</b>", secondary_y=False)
+    #fig.update_yaxes(title_text="<b>Volume</b>", secondary_y=True)
 
     return fig
 
@@ -437,7 +444,7 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
     df = get_cum_return(ls, start_date, end_date)
     df['Stock/ETF'] = df['Stock/ETF'].str.replace('VOO', 'VOO (S&P 500)')
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
-                 title="Cumulative Return"
+                 title="Comparing Cumulative Return"
                  )
     fig.update_layout(height=600, 
             template='plotly_dark')           
@@ -495,14 +502,10 @@ def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters)
 
     fig.update_layout(height=600,
         title = 'K-means Clustering',
-        template='seaborn')    
+        template='plotly')    
     
     return fig
     
-
-
-
-
 
 
 # Table

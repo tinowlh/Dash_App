@@ -4,6 +4,7 @@ VT,VT (Total World Stock),ETF,US,Y
 VTI,VTI (US Total Stock),ETF,US,Y
 VEA,VEA (Developed Markets Stock),ETF,US,Y
 VWO,VWO (Emerging Markets Stock),ETF,US,Y
+VFH, VFH (Financial Stocks),ETF, US,Y
 BND,BND (US Total Bond),ETF,US,Y
 0050.TW,0050.TW,ETF,TW,N
 ESPO,ESPO (Gaming and eSports ETF),ETF,US,N
@@ -11,3 +12,5 @@ SKYY,SKYY (Cloud Computing ETF),ETF,US,N
 NVDA,NVIDIA,Stock,US,N
 AMD,AMD,Stock,US,N
 INTC,Intel,Stock,US,N
+JPM, JPMorgan, Stock, US, N
+BRK-B, Berkshire Hathaway, Stock, US, N
