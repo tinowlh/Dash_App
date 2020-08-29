@@ -277,7 +277,7 @@ content_fifth_row = dbc.Row(
 
 content = html.Div(
     [
-        dcc.Markdown('Update every 30 seconds',style={'textAlign': 'right'}),
+        dcc.Markdown('Update every 60 seconds',style={'textAlign': 'right'}),
         html.H2('Stock Analysis Dashboard', style=TEXT_STYLE),
         html.Hr(),
         content_first_row,
@@ -291,7 +291,7 @@ content = html.Div(
         content_fifth_row,
         dcc.Interval(
                 id='interval-component',
-                interval=30*1000, # in milliseconds 30sec update
+                interval=60*1000, # in milliseconds 60sec update
                 n_intervals=0
                     )
     ],
