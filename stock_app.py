@@ -142,7 +142,7 @@ SIDEBAR_STYLE = {
 TEXT_STYLE = {
     'textAlign': 'center',
     'color': '#191970',
-    'background-color': '#ecf0f1'
+    'background-color': '#ffffff'
 }
 
 
