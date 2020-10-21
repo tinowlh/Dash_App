@@ -488,10 +488,8 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
 # clustering
 @app.callback(Output('graph-cluster', 'figure'),
             [Input('my-dropdown', 'value'),
-            Input('my-date-picker-range', 'start_date'),
-            Input('my-date-picker-range', 'end_date'),
             Input("cluster-count", "value")])
-def update_clustering(selected_dropdown_value, start_date, end_date, n_clusters):
+def update_clustering(selected_dropdown_value,n_clusters):
     # data preparation
     df_cluster = get_df_cluster(l_cluster)
     df = df_cluster.loc[:, ['AnnReturn', 'Volatility']]
