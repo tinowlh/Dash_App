@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_auth
 
+
 import pandas as pd
 from pandas_datareader import data as web
 from datetime import datetime as dt
@@ -18,17 +19,44 @@ import plotly.io as pio #themes
 
 from sklearn.cluster import KMeans
 
+from flask_caching import Cache
+
+#import datetime
+#import investpy
+#pio.templates
 
 # testttt
 
 
-#import datetime
-#import investpy
+# Keep this out of source code repository - save in a file or a database
 
-#pio.templates
+VALID_USERNAME_PASSWORD_PAIRS = {
+    'hello': 'world',
+    'A':'BC'
+}
+
+
+### Initialize app ###
+app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
+app.title = 'Stock Analysis' #web tab title
+server = app.server
+
+cache = Cache(app.server, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': 'cache-directory'
+})
+
+
+#auth = dash_auth.BasicAuth(
+#    app,
+#    VALID_USERNAME_PASSWORD_PAIRS
+#)
 
 
 
+TIMEOUT = 60
+
+@cache.memoize(timeout=TIMEOUT)
 def get_stockV_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     # data preparation
     df = web.DataReader(l_of_stocks, 'yahoo', start, end)
@@ -36,7 +64,7 @@ def get_stockV_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df.columns =df.columns.droplevel()
     return df
 
-
+@cache.memoize(timeout=TIMEOUT)
 def get_stockP_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     # data preparation
     df = web.DataReader(l_of_stocks, 'yahoo', start, end)
@@ -99,13 +127,6 @@ def get_df_cluster(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     return df_cluster
 
 
-
-# Keep this out of source code repository - save in a file or a database
-
-VALID_USERNAME_PASSWORD_PAIRS = {
-    'hello': 'world',
-    'A':'BC'
-}
 
 ### Data preprocess ###
 #import csv
@@ -299,17 +320,7 @@ content = html.Div(
 )
 
 
-### Initialize app ###
-app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
-app.title = 'Stock Analysis' #web tab title
-server = app.server
 app.layout = html.Div([sidebar, content])
-
-#auth = dash_auth.BasicAuth(
-#    app,
-#    VALID_USERNAME_PASSWORD_PAIRS
-#)
-
 
 
 ### Callback ###
