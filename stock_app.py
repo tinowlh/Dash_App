@@ -272,7 +272,10 @@ content_third_row = dbc.Row(
 
 content_fourth_row = dbc.Row(
     [
-        dbc.Col(dcc.Graph(id='graph-cluster'), md=12)
+        dbc.Col(
+            dcc.Graph(id='graph-cluster'), md=12),
+
+
     ]
 )
 
@@ -310,6 +313,7 @@ content = html.Div(
         content_third_row,
         html.Br(),
         content_fourth_row,
+        dbc.Spinner(html.Div(id="graph-cluster")),
         html.Br(),
         content_fifth_row,
         dcc.Interval(
