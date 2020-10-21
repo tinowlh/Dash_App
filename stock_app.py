@@ -320,8 +320,6 @@ content = html.Div(
 )
 
 
-app.layout = html.Div([sidebar, content])
-
 
 ### Callback ###
 
