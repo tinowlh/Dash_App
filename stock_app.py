@@ -319,6 +319,8 @@ content = html.Div(
     style=CONTENT_STYLE
 )
 
+app.layout = html.Div([sidebar, content])
+
 
 
 ### Callback ###
