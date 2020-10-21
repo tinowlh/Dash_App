@@ -84,7 +84,7 @@ def get_stockP_return(df_stock):
     df_stock_return = df_stock_return.reset_index('Date')
     return df_stock_return
 
-
+@cache.memoize(timeout=TIMEOUT)
 def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df = get_stockP_raw(l_of_stocks, start, end)
     df_daily_return = df.pct_change()
@@ -97,7 +97,7 @@ def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
                          value_name='CumReturn')
     return df_unpivot
 
-
+@cache.memoize(timeout=TIMEOUT)
 def get_annualizedReturn(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df = get_stockP_raw(l_of_stocks, start, end)
     ttl_return = (df.iloc[-1] - df.iloc[0]) / df.iloc[0]
@@ -105,14 +105,16 @@ def get_annualizedReturn(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df_annualized_return = ((1 + df_ttl_return) ** (365 / len(df))) -1 
     df_annualized_return = df_annualized_return.rename(columns={"TTLReturn": "AnnReturn"})
     return df_annualized_return
-   
+
+@cache.memoize(timeout=TIMEOUT)   
 def get_volatility(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df = get_stockP_raw(l_of_stocks, start, end)
     df_return = df.pct_change()
     sr_volatility = df_return.std() * np.sqrt(250)
     df_volatility = sr_volatility.to_frame(name="Volatility")
     return df_volatility
-
+    
+@cache.memoize(timeout=TIMEOUT)
 def get_df_cluster(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
     df_annualized_return = get_annualizedReturn(l_of_stocks, start, end)
     df_volatility = get_volatility(l_of_stocks, start, end)
