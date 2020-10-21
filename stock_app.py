@@ -258,14 +258,27 @@ content_first_row = dbc.Row(
 
 content_second_row = dbc.Row(
     [
-        dbc.Col(dcc.Graph(id='my-line-bar-chart'), md=12)
+        dbc.Col(
+            dcc.Loading(
+                id="loading-line-bar-chart",
+                type="dot",
+                children= dcc.Graph(id='my-line-bar-chart')
+                ), 
+            md=12)
     ]
 )
 
 
 content_third_row = dbc.Row(
     [
-        dbc.Col(dcc.Graph(id='graph-benchmark'), md=12)
+
+        dbc.Col(
+            dcc.Loading(
+                id="loading-benchmark",
+                type="dot",
+                children=dcc.Graph(id='graph-benchmark')
+                ), 
+                md=12)
     ]
 )
 
@@ -274,8 +287,8 @@ content_fourth_row = dbc.Row(
     [
         dbc.Col(
             dcc.Loading(
-                id="loading-1",
-                type="default",
+                id="loading-cluster",
+                type="dot",
                 children=dcc.Graph(id='graph-cluster')
                 ),
                 md=12),
