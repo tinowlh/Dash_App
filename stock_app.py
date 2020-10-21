@@ -273,9 +273,12 @@ content_third_row = dbc.Row(
 content_fourth_row = dbc.Row(
     [
         dbc.Col(
-            dcc.Graph(id='graph-cluster'), md=12),
-
-
+            dcc.Loading(
+                id="loading-1",
+                type="default",
+                children=dcc.Graph(id='graph-cluster')
+                ),
+                md=12),
     ]
 )
 
