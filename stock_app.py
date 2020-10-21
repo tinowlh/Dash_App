@@ -1,3 +1,4 @@
+# dash
 import dash
 import dash_table
 from dash.dependencies import Input, Output, State
@@ -6,37 +7,27 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_auth
 
-
-import pandas as pd
-from pandas_datareader import data as web
-from datetime import datetime as dt
-import numpy as np
-
+# plot
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio #themes
 
+
+# data
+import pandas as pd
+from pandas_datareader import data as web
+from datetime import datetime as dt
+import numpy as np
+
+# ML
 from sklearn.cluster import KMeans
 
+# cache
 from flask_caching import Cache
 
-#import datetime
-#import investpy
-#pio.templates
 
-# testttt
-
-
-# Keep this out of source code repository - save in a file or a database
-
-VALID_USERNAME_PASSWORD_PAIRS = {
-    'hello': 'world',
-    'A':'BC'
-}
-
-
-### Initialize app ###
+###### Initialize app ######
 app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
 app.title = 'Stock Analysis' #web tab title
 server = app.server
@@ -46,6 +37,14 @@ cache = Cache(app.server, config={
     'CACHE_DIR': 'cache-directory'
 })
 
+
+
+# Keep this out of source code repository - save in a file or a database
+
+VALID_USERNAME_PASSWORD_PAIRS = {
+    'hello': 'world',
+    'A':'BC'
+}
 
 #auth = dash_auth.BasicAuth(
 #    app,
@@ -130,7 +129,7 @@ def get_df_cluster(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
 
 
 
-### Data preprocess ###
+###### Data preprocess ######
 #import csv
 df_stockls = pd.read_csv('stocklist.csv')
 df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
@@ -147,8 +146,9 @@ df_stock = df_stock.sort_values(by='Date', ascending=False)
 
 
 
-
+###### LAYOUT ######
 ### SIDEBAR ###
+
 # the style arguments for the sidebar.
 SIDEBAR_STYLE = {
     'position': 'fixed',
@@ -216,7 +216,7 @@ controls = dbc.FormGroup(
         html.Br(),
         html.Br(),
         dcc.Markdown('K-means Cluster Count'),
-        dbc.Input(id="cluster-count", type="number", value=3)
+        dbc.Input(id="cluster-count", type="number", value=3, min=2, max=5, step=1)
         
     ]
 )
@@ -320,6 +320,7 @@ content = html.Div(
     ],
     style=CONTENT_STYLE
 )
+
 
 app.layout = html.Div([sidebar, content])
 
