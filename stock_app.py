@@ -313,7 +313,7 @@ content = html.Div(
         content_third_row,
         html.Br(),
         content_fourth_row,
-        dbc.Spinner(html.Div(id="graph-cluster")),
+        #dbc.Spinner(html.Div(id="graph-cluster")),
         html.Br(),
         content_fifth_row,
         dcc.Interval(
