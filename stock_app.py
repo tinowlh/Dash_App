@@ -216,7 +216,15 @@ controls = dbc.FormGroup(
         html.Br(),
         html.Br(),
         dcc.Markdown('K-means Cluster Count'),
-        dbc.Input(id="cluster-count", type="number", value=3, min=2, max=5, step=1)
+        dbc.Input(id="cluster-count", type="number", value=3, min=2, max=5, step=1),
+        html.Br(),
+        dbc.Button(
+            "Generate Clusters !", 
+            id="button-clustering", 
+            color="primary",
+            # outline=True,
+            className="mr-1"
+            )
         
     ]
 )
@@ -346,7 +354,7 @@ app.layout = html.Div([sidebar, content])
 
 
 
-### Callback ###
+###### Callback ######
 
 #indicator
 @app.callback(Output('my-indicator', 'figure'),
@@ -405,19 +413,6 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
                     })
     return fig
 
-""" @app.callback(
-    Output(component_id='my-output', component_property='children'),
-    [Input('submit-button-state', 'n_clicks')],
-    [State('my-input1', 'value'),
-    State('my-input2', 'value')]
-)
-def update_output_div(n_clicks, input_value1, input_value2):
-    if input_value1 == None:
-        input_value1 = 0 
-    if input_value2 == None:
-        input_value2 = 0 
-    v = (input_value1 - input_value2) * 100
-    return 'Output: {} (The Button has been pressed {} times)'.format(v, n_clicks) """
 
 # Line Bar Chart
 @app.callback(Output('my-line-bar-chart', 'figure'), 
@@ -487,9 +482,11 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
 
 # clustering
 @app.callback(Output('graph-cluster', 'figure'),
-            [Input('my-dropdown', 'value'),
-            Input("cluster-count", "value")])
-def update_clustering(selected_dropdown_value,n_clusters):
+            [Input("button-clustering", "n_clicks")],
+            [State('my-dropdown', 'value'),
+            State("cluster-count", "value")]
+            )
+def update_clustering(n_clicks, selected_dropdown_value, n_clusters):
     # data preparation
     df_cluster = get_df_cluster(l_cluster)
     df = df_cluster.loc[:, ['AnnReturn', 'Volatility']]
