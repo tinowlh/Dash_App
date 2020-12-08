@@ -20,7 +20,7 @@ from pandas_datareader import data as web
 from datetime import datetime as dt
 import numpy as np
 
-# ML
+# machine learning
 from sklearn.cluster import KMeans
 
 # cache
@@ -32,19 +32,19 @@ app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
 app.title = 'Stock Analysis' #web tab title
 server = app.server
 
+# Flask cache
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',
     'CACHE_DIR': 'cache-directory'
 })
 
 
-
-# Keep this out of source code repository - save in a file or a database
-
-VALID_USERNAME_PASSWORD_PAIRS = {
-    'hello': 'world',
-    'A':'BC'
-}
+###### Authentication ######
+# Keep this out of source code repository when it's in production - save in a file or a database
+#VALID_USERNAME_PASSWORD_PAIRS = {
+#    'hello': 'world',
+#    'world':'hello'
+#}
 
 #auth = dash_auth.BasicAuth(
 #    app,
@@ -130,7 +130,7 @@ def get_df_cluster(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
 
 
 ###### Data preprocess ######
-#import csv
+# import csv
 df_stockls = pd.read_csv('stocklist.csv')
 df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
 # df for table
@@ -146,7 +146,7 @@ df_stock = df_stock.sort_values(by='Date', ascending=False)
 
 
 
-###### LAYOUT ######
+###### UI LAYOUT ######
 ### SIDEBAR ###
 
 # the style arguments for the sidebar.
@@ -356,7 +356,7 @@ app.layout = html.Div([sidebar, content])
 
 ###### Callback ######
 
-#indicator
+# indicator
 @app.callback(Output('my-indicator', 'figure'),
             [Input('my-dropdown', 'value'),
             Input('my-date-picker-range', 'start_date'),
@@ -401,7 +401,6 @@ def update_indicator(selected_dropdown_value, start_date, end_date, n):
         paper_bgcolor="#EBF5FB",
         autosize=True,
         margin=dict(l=40,r=40,b=40,t=50,pad=4),
-#        width=300,
         height=130,
         grid = {'rows': 1, 'columns': 3, 'pattern': "independent"},
         template = {'data' : {'indicator': [{
@@ -484,8 +483,7 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
 @app.callback(Output('graph-cluster', 'figure'),
             [Input("button-clustering", "n_clicks")],
             [State('my-dropdown', 'value'),
-            State("cluster-count", "value")]
-            )
+            State("cluster-count", "value")])
 def update_clustering(n_clicks, selected_dropdown_value, n_clusters):
     # data preparation
     df_cluster = get_df_cluster(l_cluster)
@@ -556,3 +554,4 @@ def update_datatable(start_date, end_date, n):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+    # app.run_server(host='0.0.0.0', port=9000)
