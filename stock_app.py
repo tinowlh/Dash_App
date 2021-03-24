@@ -553,7 +553,7 @@ def update_clustering(n_clicks, selected_dropdown_value, n_clusters):
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_datatable(start_date, end_date, n):
-    df_stock = Preprocess(l_of_stocks).get_stockP_add_date()
+    df_stock = Preprocess(l_of_stocks, start_date, end_date).get_stockP_add_date()
     df_stock = df_stock.sort_values(by='Date', ascending=False)
     data=df_stock.to_dict('records')
     
