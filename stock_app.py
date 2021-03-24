@@ -208,18 +208,18 @@ controls = dbc.FormGroup(
         html.Br(),
         html.Br(),
         html.Br(),
-        dcc.Markdown('Cumulative Return Benchmark'),
+        dcc.Markdown('Cumulative Return Stock/ETF 1'),
         dcc.Dropdown(
             id='dropdown_benchmark1',
-            options= df_stockls[df_stockls['benchmark'] == 'Y'][['value', 'label']].to_dict('records'),
+            options= df_stockls[['value', 'label']].to_dict('records'),
             value='VOO',
             style= {'color':'#000000'}
                 ),
         html.Br(),
-        dcc.Markdown('Cumulative Return Stock/ETF'),        
+        dcc.Markdown('Cumulative Return Stock/ETF 2'),        
         dcc.Dropdown(
             id='dropdown_benchmark2',
-            options= df_stockls[df_stockls['benchmark'] == 'N'][['value', 'label']].to_dict('records'),
+            options= df_stockls[['value', 'label']].to_dict('records'),
             value='0050.TW',
             style= {'color':'#000000'}
                 ),
