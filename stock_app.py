@@ -55,93 +55,105 @@ cache = Cache(app.server, config={
 
 TIMEOUT = 60
 
-@cache.memoize(timeout=TIMEOUT)
-def get_stockV_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    # data preparation
-    df = web.DataReader(l_of_stocks, 'yahoo', start, end)
-    df = df.loc[:, df.columns.get_level_values(0).isin({'Volume'})]
-    df.columns =df.columns.droplevel()
-    return df
-
-@cache.memoize(timeout=TIMEOUT)
-def get_stockP_raw(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    # data preparation
-    df = web.DataReader(l_of_stocks, 'yahoo', start, end)
-    df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})].round(2)
-    df.columns =df.columns.droplevel()
-    return df
-
-def add_date_col(df):
-    df = df.reset_index('Date')
-    df['Date'] = df['Date'].dt.date
-    return df
-
-
-def get_stockP_return(df_stock):
-    df_stock = df_stock.set_index('Date')
-    df_stock_return = df_stock.pct_change().round(4)
-    df_stock_return = df_stock_return.reset_index('Date')
-    return df_stock_return
-
-@cache.memoize(timeout=TIMEOUT)
-def get_cum_return(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockP_raw(l_of_stocks, start, end)
-    df_daily_return = df.pct_change()
-    df_daily_cum_return = (1 + df_daily_return).cumprod()
-    df_daily_cum_return = df_daily_cum_return.reset_index('Date')
-    df_daily_cum_return = df_daily_cum_return.round(4)
-    #df_daily_cum_return['Date'] = df_daily_cum_return['Date'].dt.date
-    df_unpivot = df_daily_cum_return.melt(id_vars='Date',
-                         var_name= 'Stock/ETF', 
-                         value_name='CumReturn')
-    return df_unpivot
-
-@cache.memoize(timeout=TIMEOUT)
-def get_annualizedReturn(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockP_raw(l_of_stocks, start, end)
-    ttl_return = (df.iloc[-1] - df.iloc[0]) / df.iloc[0]
-    df_ttl_return = ttl_return.to_frame(name="TTLReturn")
-    df_annualized_return = ((1 + df_ttl_return) ** (365 / len(df))) -1 
-    df_annualized_return = df_annualized_return.rename(columns={"TTLReturn": "AnnReturn"})
-    return df_annualized_return
-
-@cache.memoize(timeout=TIMEOUT)   
-def get_volatility(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df = get_stockP_raw(l_of_stocks, start, end)
-    df_return = df.pct_change()
-    sr_volatility = df_return.std() * np.sqrt(250)
-    df_volatility = sr_volatility.to_frame(name="Volatility")
-    return df_volatility
+class ImportData():
     
-@cache.memoize(timeout=TIMEOUT)
-def get_df_cluster(l_of_stocks, start = dt(2020, 1, 1), end = dt.now()):
-    df_annualized_return = get_annualizedReturn(l_of_stocks, start, end)
-    df_volatility = get_volatility(l_of_stocks, start, end)
-    
-    # merge
-    df_cluster = pd.merge(df_annualized_return, 
-                          df_volatility, 
-                          left_index=True, right_index = True)
-    df_cluster = round(df_cluster, 4)                      
-    df_cluster = df_cluster.reset_index()
-    
-    return df_cluster
+    def __init__(self, l_of_stocks, start=dt(2020, 1, 1), end=dt.now()):
+        self.l_of_stocks = l_of_stocks
+        self.start = start
+        self.end = end
 
+    @cache.memoize(timeout=TIMEOUT)
+    def get_stockV_raw(self):
+        # data preparation
+        df = web.DataReader(self.l_of_stocks, 'yahoo', self.start, self.end)
+        df = df.loc[:, df.columns.get_level_values(0).isin({'Volume'})]
+        df.columns =df.columns.droplevel()
+        return df
+
+    @cache.memoize(timeout=TIMEOUT)
+    def get_stockP_raw(self):
+        # data preparation
+        df = web.DataReader(self.l_of_stocks, 'yahoo', self.start, self.end)
+        df = df.loc[:, df.columns.get_level_values(0).isin({'Close'})].round(2)
+        df.columns =df.columns.droplevel()
+        return df
+    
+    
+class Preprocess(ImportData):
+
+    def __init__(self, l_of_stocks, start=dt(2020, 1, 1), end=dt.now()):
+        super().__init__(l_of_stocks, start, end)
+
+    def get_stockP_add_date(self):
+        df = super().get_stockP_raw()
+        df = df.reset_index('Date')
+        df['Date'] = df['Date'].dt.date
+        return df
+    
+    def get_stockP_return(self):
+        df = self.get_stockP_add_date()
+        df = df.set_index('Date')
+        df = df.pct_change().round(4)
+        df = df.reset_index('Date')
+        return df
+
+    def get_cum_return(self):
+        df = super().get_stockP_raw()
+        df_daily_return = df.pct_change()
+        df_daily_cum_return = (1 + df_daily_return).cumprod()
+        df_daily_cum_return = df_daily_cum_return.reset_index('Date')
+        df_daily_cum_return = df_daily_cum_return.round(4)
+        #df_daily_cum_return['Date'] = df_daily_cum_return['Date'].dt.date
+        df_unpivot = df_daily_cum_return.melt(id_vars='Date',
+                            var_name= 'Stock/ETF', 
+                            value_name='CumReturn')
+        return df_unpivot
+
+    def get_annualizedReturn(self):
+        df = super().get_stockP_raw()
+        ttl_return = (df.iloc[-1] - df.iloc[0]) / df.iloc[0]
+        df_ttl_return = ttl_return.to_frame(name="TTLReturn")
+        df_annualized_return = ((1 + df_ttl_return) ** (365 / len(df))) -1 
+        df_annualized_return = df_annualized_return.rename(columns={"TTLReturn": "AnnReturn"})
+        return df_annualized_return
+    
+    def get_volatility(self):
+        df = super().get_stockP_raw()
+        df_return = df.pct_change()
+        sr_volatility = df_return.std() * np.sqrt(250)
+        df_volatility = sr_volatility.to_frame(name="Volatility")
+        return df_volatility
+    
+    # @cache.memoize(timeout=TIMEOUT)
+    def get_df_cluster(self):
+        df_annualized_return = self.get_annualizedReturn()
+        df_volatility = self.get_volatility()
+        
+        # merge
+        df_cluster = pd.merge(df_annualized_return, 
+                            df_volatility, 
+                            left_index=True, right_index = True)
+        df_cluster = round(df_cluster, 4)                      
+        df_cluster = df_cluster.reset_index()
+        
+        return df_cluster
 
 
 ###### Data preprocess ######
 # import csv
 df_stockls = pd.read_csv('stocklist.csv')
 df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
+
 # df for table
 l_of_stocks = df_stockls['value'].tolist()
 l_cluster = df_stockls['value'].tolist()
 l_cluster.remove('0050.TW')
-df_stock = get_stockP_raw(l_of_stocks)
-df_stock = add_date_col(df_stock)
-#df_stock_return = get_stockP_return(df_stock)
 
+pp = Preprocess(l_of_stocks)
+df_stock = pp.get_stockP_add_date()
 df_stock = df_stock.sort_values(by='Date', ascending=False)
+
+# df_stock_return = pp.get_stockP_return()
 #df_stock_return = df_stock_return.sort_values(by='Date', ascending=False)
 
 
@@ -469,7 +481,7 @@ def update_graph(selected_dropdown_value, start_date, end_date, n):
             Input('interval-component', 'n_intervals')])
 def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, end_date, n):
     ls = [dropdown_bmak1_value, dropdown_bmak2_value]
-    df = get_cum_return(ls, start_date, end_date)
+    df = Preprocess(ls, start_date, end_date).get_cum_return()
     df['Stock/ETF'] = df['Stock/ETF'].str.replace('VOO', 'VOO (S&P 500)')
     fig = px.line(df, x="Date", y="CumReturn", color='Stock/ETF',
                  title="Comparing Cumulative Return"
@@ -486,7 +498,7 @@ def update_graph_bmrk(dropdown_bmak1_value, dropdown_bmak2_value, start_date, en
             State("cluster-count", "value")])
 def update_clustering(n_clicks, selected_dropdown_value, n_clusters):
     # data preparation
-    df_cluster = get_df_cluster(l_cluster)
+    df_cluster = Preprocess(l_cluster).get_df_cluster()
     df = df_cluster.loc[:, ['AnnReturn', 'Volatility']]
     
     #K-means Clustering
@@ -541,8 +553,7 @@ def update_clustering(n_clicks, selected_dropdown_value, n_clusters):
             Input('my-date-picker-range', 'end_date'),
             Input('interval-component', 'n_intervals')])
 def update_datatable(start_date, end_date, n):
-    df_stock = get_stockP_raw(l_of_stocks, start_date, end_date)
-    df_stock = add_date_col(df_stock)
+    df_stock = Preprocess(l_of_stocks).get_stockP_add_date()
     df_stock = df_stock.sort_values(by='Date', ascending=False)
     data=df_stock.to_dict('records')
     
@@ -553,5 +564,5 @@ def update_datatable(start_date, end_date, n):
 #app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
-    # app.run_server(host='0.0.0.0', port=9000)
+    app.run_server(debug=True) 
+    # app.run_server(host='0.0.0.0', port=9000) # local
