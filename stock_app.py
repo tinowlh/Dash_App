@@ -324,12 +324,23 @@ content_fifth_row = dbc.Row(
             columns=[{"name": i, "id": i} for i in df_stock.columns],
             data=df_stock.to_dict('records'),
             page_size = 20,
-    #       style_as_list_view=True,
+           style_as_list_view=True,
     #       fixed_rows={'headers': True},
             sort_action="native",
             style_header={'backgroundColor': 'rgb(224, 224, 224)',
                         'fontWeight': 'bold'},
-            style_as_list_view=True,
+            style_cell={'fontSize':16},
+            style_data_conditional=[
+                {
+                    'if': {'row_index': 'odd'},
+                    'backgroundColor': 'rgb(248, 248, 248)'
+                },
+                # {
+                #     'if': {'column_id': 'Date'},
+                #     'backgroundColor': 'rgb(224, 224, 224)'
+                # }
+
+                                  ],
             ),
          md=12
         ) 
