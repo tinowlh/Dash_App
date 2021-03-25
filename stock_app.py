@@ -328,7 +328,8 @@ content_fifth_row = dbc.Row(
     #       fixed_rows={'headers': True},
             sort_action="native",
             style_header={'backgroundColor': 'rgb(224, 224, 224)',
-                        'fontWeight': 'bold'}
+                        'fontWeight': 'bold'},
+            style_as_list_view=True,
             ),
          md=12
         ) 
