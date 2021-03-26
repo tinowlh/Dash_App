@@ -142,12 +142,13 @@ class Preprocess(ImportData):
 ###### Data preprocess ######
 # import csv
 df_stockls = pd.read_csv('stocklist.csv')
-df_stockls = df_stockls[~df_stockls['value'].isin(['NVDA', 'BND'])]
+df_stockls = df_stockls[~df_stockls['value'].isin(['VFH','JPM'])]
 
-# df for table
+# list & df for table
 l_of_stocks = df_stockls['value'].tolist()
 l_cluster = df_stockls['value'].tolist()
 l_cluster.remove('0050.TW')
+l_cluster.remove('BND')
 
 pp = Preprocess(l_of_stocks)
 df_stock = pp.get_stockP_add_date()
@@ -329,7 +330,7 @@ content_fifth_row = dbc.Row(
             sort_action="native",
             style_header={'backgroundColor': 'rgb(224, 224, 224)',
                         'fontWeight': 'bold'},
-            style_cell={'fontSize':16},
+            style_cell={'fontSize':14},
             style_data_conditional=[
                 {
                     'if': {'row_index': 'odd'},
