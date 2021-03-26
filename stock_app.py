@@ -553,7 +553,7 @@ def update_clustering(n_clicks, selected_dropdown_value, n_clusters):
     fig = go.Figure(data=data, layout=layout)
 
     fig.update_layout(height=600,
-        title = 'K-means Clustering   (each data point is a stock/ETF)',
+        title = 'K-means Clustering   (each data point represents a stock/ETF)',
         template='plotly')    
     
     return fig
