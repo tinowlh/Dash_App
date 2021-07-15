@@ -57,7 +57,7 @@ TIMEOUT = 60
 
 class ImportData():
     
-    def __init__(self, l_of_stocks, start=dt(2020, 1, 1), end=dt.now()):
+    def __init__(self, l_of_stocks, start=dt(2021, 1, 1), end=dt.now()):
         self.l_of_stocks = l_of_stocks
         self.start = start
         self.end = end
@@ -81,7 +81,7 @@ class ImportData():
     
 class Preprocess(ImportData):
 
-    def __init__(self, l_of_stocks, start=dt(2020, 1, 1), end=dt.now()):
+    def __init__(self, l_of_stocks, start=dt(2021, 1, 1), end=dt.now()):
         super().__init__(l_of_stocks, start, end)
 
     def get_stockP_add_date(self):
@@ -199,10 +199,10 @@ controls = dbc.FormGroup(
         dcc.DatePickerRange(
             id='my-date-picker-range',
             display_format='YYYY-MM-DD',
-            start_date = dt(2020, 1, 1),
+            start_date = dt(2021, 1, 1),
             min_date_allowed=dt(2018, 1, 1),
             max_date_allowed=dt.now(),
-            initial_visible_month=dt(2020, 1, 1),
+            initial_visible_month=dt(2021, 1, 1),
             end_date=dt.now().date()
                         ),
         html.Br(),
@@ -553,7 +553,7 @@ def update_clustering(n_clicks, selected_dropdown_value, n_clusters):
     fig = go.Figure(data=data, layout=layout)
 
     fig.update_layout(height=600,
-        title = 'K-means Clustering   (each data point represents a stock/ETF)',
+        title = 'K-means Clustering   (each data point represents a stock/ETF performance in 2021)',
         template='plotly')    
     
     return fig
@@ -577,5 +577,5 @@ def update_datatable(start_date, end_date, n):
 #app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 if __name__ == '__main__':
-    app.run_server(debug=True) 
+    app.run_server(debug=False) 
     # app.run_server(host='0.0.0.0', port=9000) # local
