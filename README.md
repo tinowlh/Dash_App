@@ -1,5 +1,5 @@
 # Stock Analysis Web App
-An interactive stock/ETF analysis dashboard showing k-means clustering, annualized returns, Sharpe ratios, and a comparison of cumulative returns, built with Python Dash.
+An interactive stock/ETF analysis dashboard showing k-means clustering, annualized returns, Sharpe ratios, and a comparison of cumulative returns, deployed on Heroku, and built with Python Dash.
 
 ![Screenshot1](https://github.com/tinowlh/Dash_App/blob/master/assets/screenshot1.png?raw=true)
 
